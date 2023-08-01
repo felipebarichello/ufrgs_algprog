@@ -1,5 +1,5 @@
 /*
-* Código de mais alto nível relacionado ao jogo em si
+* Cï¿½digo de mais alto nï¿½vel relacionado ao jogo em si
 */
 
 
@@ -21,13 +21,49 @@ struct {
 
 Player player;
 
-// Um pool maior que o necessário é mais otimizado que o uso da heap
-Enemy enemy_pool[ENEMY_MAX] = {0};
+// Object pooling ï¿½ uma tï¿½cnica de armazenar os objetos em uma array finita jï¿½ desde o comeï¿½o,
+// reaproveitando os objetos jï¿½ destruï¿½dos ou ainda nï¿½o criados
+struct {
+	// O pool de fato
+	struct PooledEnemy {
+		Enemy enemy;
+		int active; // Booleana para o estado do inimigo
+	} pool[ENEMY_MAX];
+
+	// Os bounds sï¿½o para questï¿½es de performance.
+	// Atualizando-os, nï¿½o precisaremos avaliar todos os inimigos para verificar seus estados
+	int lower_bound;
+	int upper_bound;
+} enemy_pool;
+
+int is_solid(Vec2 position);
+int spawn_enemy(Vec2 position);
+void draw_in_matrix(Vec2 position, Color color);
+
 
 // Inicializa o jogo
 void Init() {
+	int i;
+
+	// Inicializar a posiï¿½ï¿½o do jogador
 	player.position.x = 8;
 	player.position.y = 8;
+
+	// Inicializar os inimigos
+	// Apenas ï¿½ necessï¿½rio inicializar os bounds e desativar os inimigos desnecessï¿½rios
+	for (i = 0; i < ENEMY_MAX; i++) {
+		enemy_pool.pool[i].active = 0;
+	}
+
+	enemy_pool.lower_bound = 0;
+	enemy_pool.upper_bound = 0;
+
+	Vec2 pos;
+
+	pos.x = 30;
+	pos.y = 8;
+
+	spawn_enemy(pos);
 }
 
 // Trata o input
@@ -56,32 +92,80 @@ void Update() {
 
 // Chamado entre BeginDrawing() e EndDrawing() em cada frame
 void Draw() {
+	int i;
+	size_t min_bound, max_bound;
+
+	// Limpar tela do frame anterior
 	ClearBackground(BLACK);
 
+	// Desenhar os inimigos
+	if (enemy_pool.lower_bound < enemy_pool.upper_bound) {
+		min_bound = enemy_pool.lower_bound;
+		max_bound = enemy_pool.upper_bound;
+	} else {
+		min_bound = enemy_pool.upper_bound;
+		max_bound = enemy_pool.lower_bound;
+	}
+
+	for (i = min_bound; i <= max_bound; i++) {
+		if (enemy_pool.pool[i].active) {
+			draw_in_matrix(enemy_pool.pool[i].enemy.position, RED);
+		}
+	}
+
 	// Desenhar o jogador
-	DrawRectangle(player.position.x * UNIT_LENGTH, player.position.y * UNIT_LENGTH, UNIT_LENGTH, UNIT_LENGTH, GREEN);
+	draw_in_matrix(player.position, GREEN);
 }
 
-// Verifica se a posição é sólida e não pode ser atravessada
-// Caracteriza-se como sólido:
-//   - Bordas do nível
-//   - Paredes indestrutíveis
-//   - Áreas soterradas
+// Verifica se a posiï¿½ï¿½o ï¿½ sï¿½lida e nï¿½o pode ser atravessada
+// Caracteriza-se como sï¿½lido:
+//   - Bordas do nï¿½vel
+//   - Paredes indestrutï¿½veis
+//   - ï¿½reas soterradas
 int is_solid(Vec2 position) {
 	int i;
 
-	// Bordas do nível
+	// Bordas do nï¿½vel
 	if (position.x < 0 || position.x >= LEVEL_WIDTH || position.y < 0 || position.y >= LEVEL_HEIGHT) {
 		return 1;
 	}
 
-	// Paredes indestrutíveis
+	// Paredes indestrutï¿½veis
 	for (i = 0; i < UNIT_LENGTH; i++) {
 		// ...
 	}
 	
-	// Áreas soterradas
+	// ï¿½reas soterradas
 	// ...
 
 	return 0;
+}
+
+int spawn_enemy(Vec2 position) {
+	struct PooledEnemy* enemy;
+
+	// Aqui, `upper_bound` pode se tornar igual a `lower_bound` ou sair para fora da array
+	enemy_pool.upper_bound++;
+
+	// Caso saia para fora da array
+	if (enemy_pool.upper_bound == ENEMY_MAX) {
+		enemy_pool.upper_bound = 0;
+	}
+
+	// Caso se torne igual a `lower_bound`, incrementar `lower_bound`
+	if (enemy_pool.upper_bound == enemy_pool.lower_bound) {
+		enemy_pool.lower_bound++;
+
+		if (enemy_pool.lower_bound == ENEMY_MAX) {
+			enemy_pool.lower_bound = 0;
+		}
+	}
+
+	enemy = &enemy_pool.pool[enemy_pool.upper_bound];
+	enemy->enemy.position = position;
+	enemy->active = 1;
+}
+
+void draw_in_matrix(Vec2 position, Color color) {
+	DrawRectangle(position.x * UNIT_LENGTH, position.y * UNIT_LENGTH, UNIT_LENGTH, UNIT_LENGTH, color);
 }
