@@ -5,8 +5,8 @@
 
 #include <stdlib.h>
 #include <time.h>
-#include "raylib.h"
-#include "game.h"
+#include "gamelib.h"
+#include "level.h"
 
 #define WINDOW_WIDTH 800
 #define WINDOW_HEIGHT 600
@@ -17,14 +17,14 @@ int main() {
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Pac-Mine");
 	// ToggleFullscreen();
 
-	Init(); // Implementado por game.c
+	// Menu_Init();
+	Level_Init(); // Implementado por game.c
 
 	while (!WindowShouldClose()) {
-		HandleInput();
-		Update(); // Implementado por game.c
+		Level_Update(); // Implementado por game.c
 
 		BeginDrawing();
-		Draw(); // Implementado por game.c
+		Level_Draw(); // Implementado por game.c
 		EndDrawing();
 	}
 

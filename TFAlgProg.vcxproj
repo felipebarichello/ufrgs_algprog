@@ -150,12 +150,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="gamelib.c" />
+    <ClCompile Include="level_lib.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="game.c" />
+    <ClCompile Include="level.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gamelib.h" />
-    <ClInclude Include="game.h" />
+    <ClInclude Include="level.h" />
+    <ClInclude Include="level_lib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

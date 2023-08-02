@@ -1,12 +1,9 @@
-/*
-* Código de mais alto nível relacionado ao jogo em si
-*/
-
+#include "level.h"
 
 #include <stdlib.h>
-#include "raylib.h"
 #include "gamelib.h"
-#include "game.h"
+#include "gamelib.h"
+#include "level_lib.h"
 
 #define FPS 60
 
@@ -22,6 +19,13 @@
 #define INITIAL_MOVE_COOLDOWN   1200
 
 #define frames(millis) millis * FPS / 1000
+
+void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
+char is_solid(Vec2 position);
+int spawn_enemy(Vec2 position);
+void update_enemy(Enemy* enemy, void*);
+void draw_in_matrix(Vec2 position, Color color);
+void draw_enemy(Enemy* enemy, void*);
 
 struct {
 	Vec2 direction;
@@ -44,16 +48,8 @@ struct {
 	int upper_bound;
 } enemy_pool;
 
-void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
-int is_solid(Vec2 position);
-int spawn_enemy(Vec2 position);
-void update_enemy(Enemy* enemy, void*);
-void draw_in_matrix(Vec2 position, Color color);
-void draw_enemy(Enemy* enemy, void*);
-
-
 // Chamada quando o jogo deve inicializar
-void Init() {
+void Level_Init() {
 	int i;
 
 	SetTargetFPS(FPS);
@@ -62,8 +58,7 @@ void Init() {
 	player.position.x = 8;
 	player.position.y = 8;
 
-	// Inicializar os inimigos
-	// Apenas é necessário inicializar os bounds e desativar os inimigos desnecess�rios
+	// Inicializar o pool de inimigos
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
 	}
@@ -71,16 +66,20 @@ void Init() {
 	enemy_pool.lower_bound = 0;
 	enemy_pool.upper_bound = 0;
 
-	Vec2 pos;
+	// Temp
+	for (i = 12; i < 22; i++) {
+		Vec2 pos;
 
-	pos.x = 30;
-	pos.y = 8;
-
-	spawn_enemy(pos);
+		pos.y = 18;
+		pos.x = i;
+		spawn_enemy(pos);
+	}
 }
 
-// Chamada quando se deve tratar o input
-void HandleInput() {
+// Chamada em cada frame antes de Draw()
+void Level_Update() {
+	Vec2 target_position;
+
 	input.direction.x = 0;
 	input.direction.y = 0;
 
@@ -88,11 +87,6 @@ void HandleInput() {
 	if (IsKeyPressed(KEY_DOWN))  input.direction.y++;
 	if (IsKeyPressed(KEY_RIGHT)) input.direction.x++;
 	if (IsKeyPressed(KEY_LEFT))  input.direction.x--;
-}
-
-// Chamada em cada frame antes de Draw()
-void Update() {
-	Vec2 target_position;
 
 	// Movimento do jogador
 	target_position = AddVec2(player.position, input.direction);
@@ -106,7 +100,7 @@ void Update() {
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
-void Draw() {
+void Level_Draw() {
 	// Limpar tela do frame anterior
 	ClearBackground(BLACK);
 
@@ -122,7 +116,7 @@ void Draw() {
 //   - Bordas do nível
 //   - Paredes indestrutíveis
 //   - Áreas soterradas
-int is_solid(Vec2 position) {
+char is_solid(Vec2 position) {
 	int i;
 
 	// Bordas do nível
@@ -251,7 +245,7 @@ void update_enemy(Enemy* enemy, void* _) {
 	}
 }
 
-// Desenhar um quadrado em uma posição da matrix
+// Desenhar um quadrado em uma posição da matriz
 void draw_in_matrix(Vec2 position, Color color) {
 	DrawRectangle(position.x * UNIT_LENGTH, position.y * UNIT_LENGTH, UNIT_LENGTH, UNIT_LENGTH, color);
 }
