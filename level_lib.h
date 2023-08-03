@@ -2,9 +2,6 @@
 
 #include "gamelib.h"
 
-#define COLOR_WALL   GRAY
-#define COLOR_BURIED LIGHTGRAY
-
 typedef struct {
 	Vec2 position;
 } Player;
@@ -28,11 +25,11 @@ typedef enum {
 	T_PLAYER = 'J', // O Jogador
 	T_ENEMY = 'T', // Cada inimigo
 
-	// S�lidos
+	// Sólidos
 	T_WALL =   '#', // Paredes          [Sólido, indestrutível]
 	T_BURIED = 'S', // Áreas soterradas [Sólido, destrutível]
 	
-	// Consum�veis
+	// Consumíveis
 	T_EMERALD = 'E', // Esmeralda
 	T_GOLD    = 'O', // Ouro
 	T_POWERUP = 'A', // Power-up

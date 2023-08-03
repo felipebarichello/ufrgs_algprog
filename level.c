@@ -2,21 +2,8 @@
 
 #include <stdlib.h>
 #include "gamelib.h"
-#include "gamelib.h"
 #include "level_lib.h"
-
-#define FPS 60
-
-#define ENEMY_MAX 20
-
-#define UNIT_LENGTH 20
-#define LEVEL_WIDTH 40
-#define LEVEL_HEIGHT 30
-
-#define MIN_ENEMY_MOVE_COOLDOWN 100
-#define MAX_ENEMY_MOVE_COOLDOWN 150
-#define ENEMY_REDIRECT_CHANCE   .2
-#define INITIAL_MOVE_COOLDOWN   1200
+#include "level_consts.h"
 
 #define frames(millis) millis * FPS / 1000
 
@@ -25,7 +12,7 @@ char is_solid(Vec2 position);
 int spawn_enemy(Vec2 position);
 void update_enemy(Enemy* enemy, void*);
 void defrag_pool();
-void draw_tile (Vec2 position, Color color);
+void draw_tile(Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
 
 struct {
@@ -34,7 +21,7 @@ struct {
 
 Player player;
 
-char map[LEVEL_WIDTH][LEVEL_HEIGHT];
+char /*Tile*/ map[LEVEL_WIDTH][LEVEL_HEIGHT];
 
 // Object pooling é uma técnica de armazenar os objetos em uma array finita ja desde o começo,
 // reaproveitando os objetos já destruídos ou ainda não criados
@@ -64,7 +51,7 @@ void Level_Init() {
 	player.position.x = 8;
 	player.position.y = 8;
 
-	// Inicializar o pool de inimigos
+	// Inicializar a pool de inimigos
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
 	}
@@ -136,7 +123,7 @@ void Level_Draw() {
 	foreach_enemy(&draw_enemy, NULL);
 
 	// Desenhar o jogador
-	draw_tile(player.position, GREEN);
+	draw_tile(player.position, COLOR_PLAYER);
 }
 
 // Verificar se a posição possui um tile sólido e não pode ser atravessada
@@ -299,5 +286,5 @@ void draw_tile(Vec2 position, Color color) {
 // Compatível com `foreach_enemy()`
 // O parâmetro `_` é ignorado
 void draw_enemy(Enemy* enemy, void* _) {
-	draw_tile(enemy->position, RED);
+	draw_tile(enemy->position, COLOR_ENEMY);
 }

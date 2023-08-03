@@ -36,6 +36,9 @@
     <ClCompile Include="level.c">
       <Filter>Arquivos de Origem\scenes\level</Filter>
     </ClCompile>
+    <ClCompile Include="level_consts.h">
+      <Filter>Arquivos de Cabeçalho\scenes\level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gamelib.h">

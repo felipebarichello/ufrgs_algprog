@@ -150,6 +150,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="gamelib.c" />
+    <ClCompile Include="level_consts.h" />
     <ClCompile Include="main.c" />
     <ClCompile Include="level.c" />
   </ItemGroup>
