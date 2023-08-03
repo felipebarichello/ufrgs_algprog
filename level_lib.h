@@ -2,18 +2,38 @@
 
 #include "gamelib.h"
 
+#define COLOR_WALL   GRAY
+#define COLOR_BURIED LIGHTGRAY
+
 typedef struct {
 	Vec2 position;
 } Player;
 
 typedef struct {
-	// Posi��o do inimigo da matriz
+	// Posição do inimigo da matriz
 	Vec2 position;
 
-	// Para que dire��o o inimigo est� virado
+	// Para que direção o inimigo está virado
 	// 1, 0 ou -1 cada componente
 	Vec2 direction;
 
 	// Tempo para o inimigo poder se mover de novo
 	int move_cooldown;
 } Enemy;
+
+typedef enum {
+	T_VOID = 0, // Ausência de tile
+
+	// Entidades
+	T_PLAYER = 'J', // O Jogador
+	T_ENEMY = 'T', // Cada inimigo
+
+	// S�lidos
+	T_WALL =   '#', // Paredes          [Sólido, indestrutível]
+	T_BURIED = 'S', // Áreas soterradas [Sólido, destrutível]
+	
+	// Consum�veis
+	T_EMERALD = 'E', // Esmeralda
+	T_GOLD    = 'O', // Ouro
+	T_POWERUP = 'A', // Power-up
+} Tile;

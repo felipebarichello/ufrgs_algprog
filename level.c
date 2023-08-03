@@ -24,7 +24,8 @@ void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context)
 char is_solid(Vec2 position);
 int spawn_enemy(Vec2 position);
 void update_enemy(Enemy* enemy, void*);
-void draw_in_matrix(Vec2 position, Color color);
+void defrag_pool();
+void draw_tile (Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
 
 struct {
@@ -32,6 +33,8 @@ struct {
 } input;
 
 Player player;
+
+char map[LEVEL_WIDTH][LEVEL_HEIGHT];
 
 // Object pooling é uma técnica de armazenar os objetos em uma array finita ja desde o começo,
 // reaproveitando os objetos já destruídos ou ainda não criados
@@ -53,6 +56,9 @@ void Level_Init() {
 	int i;
 
 	SetTargetFPS(FPS);
+
+	// Ler o arquivo do mapa e transformá-lo nas entidades do mapa
+	// [...]
 
 	// Inicializar a posição do jogador
 	player.position.x = 8;
@@ -101,36 +107,55 @@ void Level_Update() {
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
 void Level_Draw() {
+	int i, j;
+
 	// Limpar tela do frame anterior
 	ClearBackground(BLACK);
+
+	// Desenhar os tiles
+	for (i = 0; i < LEVEL_WIDTH; i++) {
+		for (j = 0; j < LEVEL_HEIGHT; j++) {
+			Vec2 pos;
+
+			pos.x = i;
+			pos.y = j;
+
+			switch (map[i][j]) {
+				case T_WALL:
+					draw_tile(pos, COLOR_WALL);
+					break;
+
+				case T_BURIED:
+					draw_tile(pos, COLOR_BURIED);
+					break;
+			}
+		}
+	}
 
 	// Desenhar os inimigos
 	foreach_enemy(&draw_enemy, NULL);
 
 	// Desenhar o jogador
-	draw_in_matrix(player.position, GREEN);
+	draw_tile(player.position, GREEN);
 }
 
-// Verificar se a posição é sólida e não pode ser atravessada
-// Caracteriza-se como s�lido:
-//   - Bordas do nível
-//   - Paredes indestrutíveis
-//   - Áreas soterradas
+// Verificar se a posição possui um tile sólido e não pode ser atravessada
+// Para ver os tiles considerados sólidos, ver `level_lib.h`
 char is_solid(Vec2 position) {
-	int i;
+	int i, j;
+	Tile tile;
 
 	// Bordas do nível
 	if (position.x < 0 || position.x >= LEVEL_WIDTH || position.y < 0 || position.y >= LEVEL_HEIGHT) {
 		return 1;
 	}
 
-	// Paredes indestrutíveis
-	for (i = 0; i < UNIT_LENGTH; i++) {
-		// ...
+	// Paredes indestrutíveis e áreas soterradas
+	switch (map[position.x][position.y]) {
+		case T_WALL:
+		case T_BURIED:
+			return 1;
 	}
-	
-	// Áreas soterradas
-	// ...
 
 	return 0;
 }
@@ -154,12 +179,14 @@ int spawn_enemy(Vec2 position) {
 		enemy_pool.upper_bound = 0;
 	}
 
-	// Caso se torne igual a `lower_bound`, incrementar `lower_bound`
+	// Caso se torne igual a `lower_bound`, defragmentar pool ou sobrescrever antigo incrementar `lower_bound`
 	if (enemy_pool.upper_bound == enemy_pool.lower_bound) {
-		enemy_pool.lower_bound++;
+		defrag_pool();
 
-		if (enemy_pool.lower_bound == ENEMY_MAX) {
+		if (enemy_pool.lower_bound == ENEMY_MAX - 1) {
 			enemy_pool.lower_bound = 0;
+		} else {
+			enemy_pool.lower_bound++;
 		}
 	}
 
@@ -245,8 +272,26 @@ void update_enemy(Enemy* enemy, void* _) {
 	}
 }
 
+void defrag_pool() {
+	int i;
+	struct PooledEnemy defragged[ENEMY_MAX];
+
+	for (i = 0; i < ENEMY_MAX - enemy_pool.lower_bound; i++) {
+		defragged[i] = enemy_pool.pool[i + enemy_pool.lower_bound];
+	}
+
+	for (; i < ENEMY_MAX; i++) {
+		defragged[i] = enemy_pool.pool[i - (ENEMY_MAX - enemy_pool.lower_bound)];
+	}
+
+	// Copiar de volta para a pool global
+	for (i = 0; i < ENEMY_MAX; i++) {
+		enemy_pool.pool[i] = defragged[i];
+	}
+}
+
 // Desenhar um quadrado em uma posição da matriz
-void draw_in_matrix(Vec2 position, Color color) {
+void draw_tile(Vec2 position, Color color) {
 	DrawRectangle(position.x * UNIT_LENGTH, position.y * UNIT_LENGTH, UNIT_LENGTH, UNIT_LENGTH, color);
 }
 
@@ -254,5 +299,5 @@ void draw_in_matrix(Vec2 position, Color color) {
 // Compatível com `foreach_enemy()`
 // O parâmetro `_` é ignorado
 void draw_enemy(Enemy* enemy, void* _) {
-	draw_in_matrix(enemy->position, RED);
+	draw_tile(enemy->position, RED);
 }
