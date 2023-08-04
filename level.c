@@ -175,18 +175,12 @@ void load_map(const char* file_name) {
 		for (i = 0; line_start < bytes_read; i++) {
 			for (j = 0; map_buffer[line_start + j] != '\n' && line_start + j <= bytes_read; j++) {
 				map[i][j] = map_buffer[line_start + j];
-
-				if (j > 35) {
-					printf("\nj: %d", j);
-				}
 			}
 
 			// A largura do nível é setada várias vezes até a maior ser encontrada
 			if (j > level_size.x) {
 				level_size.x = j - 1;
 			}
-
-			printf("\nw: %d", level_size.x);
 
 			line_start += j + 1;
 		}
