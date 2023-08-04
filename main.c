@@ -1,5 +1,5 @@
 /*
-* Inicialização da janela e incorporação do programa
+* Inicializaï¿½ï¿½o da janela e incorporaï¿½ï¿½o do programa
 */
 
 
@@ -8,19 +8,22 @@
 #include "gamelib.h"
 #include "level.h"
 
-#define WINDOW_WIDTH 800
+#define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
 int main() {
 	srand(time(NULL));
 
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Pac-Mine");
-	// ToggleFullscreen();
 
 	// Menu_Init();
 	Level_Init(); // Implementado por game.c
 
 	while (!WindowShouldClose()) {
+		if (IsKeyPressed(KEY_F11)) {
+			ToggleFullscreen();
+		}
+
 		Level_Update(); // Implementado por game.c
 
 		BeginDrawing();
