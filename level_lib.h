@@ -19,11 +19,11 @@ typedef struct {
 } Enemy;
 
 typedef enum {
-	T_VOID = 0, // Ausência de tile
+	T_VOID = 0, // Ausência de tile. Todos os outros códigos inválidos também são considerados void.
 
 	// Entidades
 	T_PLAYER = 'J', // O Jogador
-	T_ENEMY = 'T', // Cada inimigo
+	T_ENEMY =  'T', // Cada inimigo
 
 	// Sólidos
 	T_WALL =   '#', // Paredes          [Sólido, indestrutível]

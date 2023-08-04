@@ -1,3 +1,6 @@
+#include "gamelib.h"
+
+
 /* --- Computador --- */
 
 #define FPS 60
@@ -5,17 +8,20 @@
 
 /* --- Visual --- */
 
-#define COLOR_PLAYER GREEN
-#define COLOR_ENEMY  RED
-#define COLOR_WALL   GRAY
-#define COLOR_BURIED LIGHTGRAY
+#define COLOR_PLAYER  BLUE
+#define COLOR_ENEMY   RED
+#define COLOR_WALL    GRAY
+#define COLOR_BURIED  LIGHTGRAY
+#define COLOR_EMERALD GREEN
+#define COLOR_GOLD    GOLD
+#define COLOR_POWERUP PURPLE
 
 
 /* --- Tamanhos --- */
 
 #define UNIT_LENGTH 20
 
-#define LEVEL_WIDTH 40
+#define LEVEL_WIDTH  20
 #define LEVEL_HEIGHT 30
 
 

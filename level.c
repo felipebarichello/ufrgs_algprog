@@ -1,6 +1,7 @@
 #include "level.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "gamelib.h"
 #include "level_lib.h"
 #include "level_consts.h"
@@ -15,13 +16,30 @@ void defrag_pool();
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
 
-struct {
-	Vec2 direction;
-} input;
-
 Player player;
 
-char /*Tile*/ map[LEVEL_WIDTH][LEVEL_HEIGHT];
+char /*Tile*/ map[LEVEL_WIDTH][LEVEL_HEIGHT] = {
+	'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#',
+	'#','J',' ',' ',' ',' ',' ','S','#',' ','T',' ',' ',' ','S','S','S','S','O','O','S','S',' ','#',' ','S','S','S','S','#',
+	'#',' ',' ',' ','A',' ',' ',' ','#',' ',' ',' ',' ',' ','S','S','S','O','O','S','S','S',' ','#',' ','S','S','S','S','#',
+	'#',' ','O',' ',' ',' ',' ',' ','#','#','#','#','#',' ',' ',' ','S','S','O','O','S','S',' ',' ',' ','S','E','O','O','#',
+	'#','#','#','#','#','#','#',' ','S','E','S','S','S',' ',' ',' ','S','S','S','S','S','S',' ',' ',' ','S','S','S','S','#',
+	'#','E','O','O','S','S','#','#','#','#','#','#','#','#',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ','S','S',' ',' ','#',
+	'#','S','S','S','S','S','S','S',' ',' ',' ',' ',' ',' ',' ',' ','S','S','S','S','S','S',' ','#',' ',' ','A',' ',' ','#',
+	'#',' ',' ','T',' ',' ',' ',' ',' ',' ',' ','A',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ','T','S','S',' ','#',
+	'#','S','O','S','S','S','O','S',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ','S','S','S',' ','#',
+	'#','S','S','S','O','O','O','S','S','S',' ',' ',' ',' ','#','#','#','#','#','#','#',' ',' ',' ',' ','S','O','O',' ','#',
+	'#','O','S','S','S','S','S','S','S','S','S',' ',' ',' ',' ',' ',' ',' ',' ',' ','T',' ',' ',' ',' ',' ',' ',' ',' ','#',
+	'#','#','#','#','#','#','#','#','#','#','#','#','#','A',' ','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#',
+	'#','T','S','S','S','S','S','S','S',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','S','S','E','#',
+	'#','O','S','S','S','S','S','S',' ',' ',' ','#','S','S','S','S','S','#',' ',' ',' ','T',' ',' ',' ','S','O','O','S','#',
+	'#','S','S','O','O','O','S','S',' ',' ',' ','#','S','S','O','O','S','#',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','S','#',
+	'#',' ',' ','#','#','#','#','#','#','#','#','#','#','O','O','#','#','#','#','#','#','#','#','#','#','#','#','S','S','#',
+	'#',' ',' ',' ',' ',' ','T',' ',' ','A',' ','S','S','S','S','S','S','S',' ',' ','T',' ',' ',' ','#',' ',' ',' ',' ','#',
+	'#',' ','S','S','S','S','S','S','S',' ',' ',' ','S','S','S','S','S',' ',' ',' ',' ','#',' ',' ','#',' ','#',' ',' ','#',
+	'#',' ','S','O','O','O','S','S','S',' ',' ',' ','S','S','E','S','S',' ',' ',' ',' ','#',' ',' ','A',' ','#',' ',' ','#',
+	'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'
+};
 
 // Object pooling é uma técnica de armazenar os objetos em uma array finita ja desde o começo,
 // reaproveitando os objetos já destruídos ou ainda não criados
@@ -40,16 +58,9 @@ struct {
 
 // Chamada quando o jogo deve inicializar
 void Level_Init() {
-	int i;
+	int i, j;
 
 	SetTargetFPS(FPS);
-
-	// Ler o arquivo do mapa e transformá-lo nas entidades do mapa
-	// [...]
-
-	// Inicializar a posição do jogador
-	player.position.x = 8;
-	player.position.y = 8;
 
 	// Inicializar a pool de inimigos
 	for (i = 0; i < ENEMY_MAX; i++) {
@@ -59,30 +70,39 @@ void Level_Init() {
 	enemy_pool.lower_bound = 0;
 	enemy_pool.upper_bound = 0;
 
-	// Temp
-	for (i = 12; i < 22; i++) {
-		Vec2 pos;
+	// Ler o arquivo do mapa e transformá-lo nas entidades do mapa
+	for (i = 0; i < LEVEL_WIDTH; i++) {
+		for (j = 0; j < LEVEL_HEIGHT; j++) {
+			Vec2 matrix_position;
 
-		pos.y = 18;
-		pos.x = i;
-		spawn_enemy(pos);
+			matrix_position.x = i;
+			matrix_position.y = j;
+
+			switch (map[i][j]) {
+				case T_PLAYER:
+					player.position = matrix_position;
+					break;
+
+				case T_ENEMY:
+					spawn_enemy(matrix_position);
+					break;
+			}
+		}
 	}
 }
 
 // Chamada em cada frame antes de Draw()
 void Level_Update() {
-	Vec2 target_position;
+	Vec2 input_dir = {0, 0}, target_position;
 
-	input.direction.x = 0;
-	input.direction.y = 0;
-
-	if (IsKeyPressed(KEY_UP))    input.direction.y--;
-	if (IsKeyPressed(KEY_DOWN))  input.direction.y++;
-	if (IsKeyPressed(KEY_RIGHT)) input.direction.x++;
-	if (IsKeyPressed(KEY_LEFT))  input.direction.x--;
+	// Lidar com input
+	if (IsKeyPressed(KEY_UP)    || IsKeyPressed(KEY_W)) input_dir.y--;
+	if (IsKeyPressed(KEY_DOWN)  || IsKeyPressed(KEY_S)) input_dir.y++;
+	if (IsKeyPressed(KEY_LEFT)  || IsKeyPressed(KEY_A)) input_dir.x--;
+	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) input_dir.x++;
 
 	// Movimento do jogador
-	target_position = AddVec2(player.position, input.direction);
+	target_position = AddVec2(player.position, input_dir);
 
 	if (!is_solid(target_position)) {
 		player.position = target_position;
@@ -114,6 +134,18 @@ void Level_Draw() {
 
 				case T_BURIED:
 					draw_tile(pos, COLOR_BURIED);
+					break;
+
+				case T_EMERALD:
+					draw_tile(pos, COLOR_EMERALD);
+					break;
+
+				case T_GOLD:
+					draw_tile(pos, COLOR_GOLD);
+					break;
+
+				case T_POWERUP:
+					draw_tile(pos, COLOR_POWERUP);
 					break;
 			}
 		}
