@@ -10,8 +10,8 @@
 
 #define COLOR_PLAYER  BLUE
 #define COLOR_ENEMY   RED
-#define COLOR_WALL    GRAY
-#define COLOR_BURIED  LIGHTGRAY
+#define COLOR_WALL    DARKGRAY
+#define COLOR_BURIED  GRAY
 #define COLOR_EMERALD GREEN
 #define COLOR_GOLD    GOLD
 #define COLOR_POWERUP PURPLE
@@ -19,10 +19,8 @@
 
 /* --- Tamanhos --- */
 
-#define UNIT_LENGTH 20
-
-#define LEVEL_WIDTH  20
-#define LEVEL_HEIGHT 30
+#define MAX_LEVEL_WIDTH  100
+#define MAX_LEVEL_HEIGHT 100
 
 
 /* --- Jogo --- */

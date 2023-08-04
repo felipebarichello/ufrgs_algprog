@@ -1,54 +1,49 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Arquivos de Origem">
+    <Filter Include="Source files">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Arquivos de Cabeçalho">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="Arquivos de Recurso">
+    <Filter Include="Resources">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Arquivos de Origem\scenes">
+    <Filter Include="Source files\Scenes">
       <UniqueIdentifier>{59219179-fd99-49c2-b77f-21f146eab226}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Arquivos de Cabeçalho\scenes">
-      <UniqueIdentifier>{db99baee-3961-434a-9ed8-52a16305b24b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Arquivos de Cabeçalho\scenes\level">
-      <UniqueIdentifier>{746df4f5-360d-4ef3-af5b-432d7bad06c1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Arquivos de Origem\scenes\level">
+    <Filter Include="Source files\Scenes\Level">
       <UniqueIdentifier>{61a602ae-2162-44fd-a1ba-1b74d465ee04}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
-      <Filter>Arquivos de Origem</Filter>
+      <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="gamelib.c">
-      <Filter>Arquivos de Origem</Filter>
+      <Filter>Source files</Filter>
     </ClCompile>
     <ClCompile Include="level.c">
-      <Filter>Arquivos de Origem\scenes\level</Filter>
+      <Filter>Source files\Scenes\Level</Filter>
     </ClCompile>
     <ClCompile Include="level_consts.h">
-      <Filter>Arquivos de Cabeçalho\scenes\level</Filter>
+      <Filter>Source files\Scenes\Level</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gamelib.h">
-      <Filter>Arquivos de Cabeçalho</Filter>
-    </ClInclude>
     <ClInclude Include="level.h">
-      <Filter>Arquivos de Cabeçalho\scenes\level</Filter>
+      <Filter>Source files\Scenes\Level</Filter>
     </ClInclude>
     <ClInclude Include="level_lib.h">
-      <Filter>Arquivos de Cabeçalho\scenes\level</Filter>
+      <Filter>Source files\Scenes\Level</Filter>
     </ClInclude>
+    <ClInclude Include="gamelib.h">
+      <Filter>Source files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="map.txt">
+      <Filter>Resources</Filter>
+    </Text>
   </ItemGroup>
 </Project>

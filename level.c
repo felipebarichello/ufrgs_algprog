@@ -8,40 +8,22 @@
 
 #define frames(millis) millis * FPS / 1000
 
-void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
+void load_map(const char* file_name);
 char is_solid(Vec2 position);
 int spawn_enemy(Vec2 position);
+void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
 void update_enemy(Enemy* enemy, void*);
 void defrag_pool();
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
 
 Player player;
+Vec2 level_size;
+int unit_length;
 
-char /*Tile*/ map[LEVEL_WIDTH][LEVEL_HEIGHT] = {
-	'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#',
-	'#','J',' ',' ',' ',' ',' ','S','#',' ','T',' ',' ',' ','S','S','S','S','O','O','S','S',' ','#',' ','S','S','S','S','#',
-	'#',' ',' ',' ','A',' ',' ',' ','#',' ',' ',' ',' ',' ','S','S','S','O','O','S','S','S',' ','#',' ','S','S','S','S','#',
-	'#',' ','O',' ',' ',' ',' ',' ','#','#','#','#','#',' ',' ',' ','S','S','O','O','S','S',' ',' ',' ','S','E','O','O','#',
-	'#','#','#','#','#','#','#',' ','S','E','S','S','S',' ',' ',' ','S','S','S','S','S','S',' ',' ',' ','S','S','S','S','#',
-	'#','E','O','O','S','S','#','#','#','#','#','#','#','#',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ','S','S',' ',' ','#',
-	'#','S','S','S','S','S','S','S',' ',' ',' ',' ',' ',' ',' ',' ','S','S','S','S','S','S',' ','#',' ',' ','A',' ',' ','#',
-	'#',' ',' ','T',' ',' ',' ',' ',' ',' ',' ','A',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ','T','S','S',' ','#',
-	'#','S','O','S','S','S','O','S',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','#',' ',' ',' ','S','S','S',' ','#',
-	'#','S','S','S','O','O','O','S','S','S',' ',' ',' ',' ','#','#','#','#','#','#','#',' ',' ',' ',' ','S','O','O',' ','#',
-	'#','O','S','S','S','S','S','S','S','S','S',' ',' ',' ',' ',' ',' ',' ',' ',' ','T',' ',' ',' ',' ',' ',' ',' ',' ','#',
-	'#','#','#','#','#','#','#','#','#','#','#','#','#','A',' ','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#',
-	'#','T','S','S','S','S','S','S','S',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','S','S','E','#',
-	'#','O','S','S','S','S','S','S',' ',' ',' ','#','S','S','S','S','S','#',' ',' ',' ','T',' ',' ',' ','S','O','O','S','#',
-	'#','S','S','O','O','O','S','S',' ',' ',' ','#','S','S','O','O','S','#',' ',' ',' ',' ',' ',' ',' ',' ',' ','S','S','#',
-	'#',' ',' ','#','#','#','#','#','#','#','#','#','#','O','O','#','#','#','#','#','#','#','#','#','#','#','#','S','S','#',
-	'#',' ',' ',' ',' ',' ','T',' ',' ','A',' ','S','S','S','S','S','S','S',' ',' ','T',' ',' ',' ','#',' ',' ',' ',' ','#',
-	'#',' ','S','S','S','S','S','S','S',' ',' ',' ','S','S','S','S','S',' ',' ',' ',' ','#',' ',' ','#',' ','#',' ',' ','#',
-	'#',' ','S','O','O','O','S','S','S',' ',' ',' ','S','S','E','S','S',' ',' ',' ',' ','#',' ',' ','A',' ','#',' ',' ','#',
-	'#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#','#'
-};
+char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 
-// Object pooling é uma técnica de armazenar os objetos em uma array finita ja desde o começo,
+// Object pooling é uma técnica de armazenar os objetos em uma array finita já desde o começo,
 // reaproveitando os objetos já destruídos ou ainda não criados
 struct {
 	// O pool de fato
@@ -62,6 +44,8 @@ void Level_Init() {
 
 	SetTargetFPS(FPS);
 
+	load_map("map.txt");
+
 	// Inicializar a pool de inimigos
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
@@ -70,13 +54,13 @@ void Level_Init() {
 	enemy_pool.lower_bound = 0;
 	enemy_pool.upper_bound = 0;
 
-	// Ler o arquivo do mapa e transformá-lo nas entidades do mapa
-	for (i = 0; i < LEVEL_WIDTH; i++) {
-		for (j = 0; j < LEVEL_HEIGHT; j++) {
-			Vec2 matrix_position;
-
-			matrix_position.x = i;
-			matrix_position.y = j;
+	// Ler o arquivo do mapa
+	//load_map("map.txt");
+	
+	// Spawnar entidades baseado no mapa
+	for (i = 0; i < level_size.y; i++) {
+		for (j = 0; j < level_size.x; j++) {
+			Vec2 matrix_position = {j, i};
 
 			switch (map[i][j]) {
 				case T_PLAYER:
@@ -120,12 +104,13 @@ void Level_Draw() {
 	ClearBackground(BLACK);
 
 	// Desenhar os tiles
-	for (i = 0; i < LEVEL_WIDTH; i++) {
-		for (j = 0; j < LEVEL_HEIGHT; j++) {
-			Vec2 pos;
+	for (i = 0; i < level_size.y; i++) {
+		Vec2 pos;
 
-			pos.x = i;
-			pos.y = j;
+		pos.y = i;
+
+		for (j = 0; j < level_size.x; j++) {
+			pos.x = j;
 
 			switch (map[i][j]) {
 				case T_WALL:
@@ -158,19 +143,68 @@ void Level_Draw() {
 	draw_tile(player.position, COLOR_PLAYER);
 }
 
+void load_map(const char* file_name) {
+	FILE* file;
+
+	// `fopen()` dava erro no VS pois é considerado deprecado.
+	// Sei que parece gambiarra, mas `fopen_s()` é a opção mais segura
+	// E também sei que parece errado o `&file`, sendo file já um `FILE*`
+	// Mas sim, `fopen_s()` requer um FILE** como primeiro parâmetro
+	// https://learn.microsoft.com/pt-br/cpp/c-runtime-library/reference/fopen-s-wfopen-s?view=msvc-170
+	if (fopen_s(&file, file_name, "rb") != 0) {
+		// Deu erro. Não abriu.
+		printf("Falha ao abrir o arquivo de mapa");
+	} else {
+		// Deu certo. Abriu.
+		printf("Arquivo de mapa aberto com sucesso");
+
+		int i, j, line_start = 0, shortest_dimension;
+		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
+		size_t bytes_read;
+
+		// Ler todo o mapa que o arquivo continha (com um máximo)
+		// 1 é somado a MAX_LEVEL_WIDTH porque o \n é um caractere que não é um elemento
+		bytes_read = fread(&map_buffer, sizeof(char), (MAX_LEVEL_WIDTH + 1) * MAX_LEVEL_HEIGHT, file);
+		fclose(file);
+
+		// Valor temporário
+		level_size.x = 0;
+
+		// Interpretar cada linha (até \n)
+		for (i = 0; line_start < bytes_read; i++) {
+			for (j = 0; map_buffer[line_start + j] != '\n'; j++) {
+				map[i][j] = map_buffer[line_start + j];
+			}
+
+			// A largura do nível é setada várias vezes até a maior ser encontrada
+			if (j > level_size.x) {
+				level_size.x = j;
+			}
+
+			line_start += j + 1;
+		}
+
+		level_size.y = i;
+
+		shortest_dimension = level_size.x < level_size.y ? level_size.x : level_size.y;
+
+		// O comprimento unitário é a menor largura de aresta de um tile que permite que o nível inteiro seja desenhado na tela
+		unit_length = GetScreenHeight() / shortest_dimension;
+	}
+}
+
 // Verificar se a posição possui um tile sólido e não pode ser atravessada
 // Para ver os tiles considerados sólidos, ver `level_lib.h`
 char is_solid(Vec2 position) {
-	int i, j;
 	Tile tile;
 
 	// Bordas do nível
-	if (position.x < 0 || position.x >= LEVEL_WIDTH || position.y < 0 || position.y >= LEVEL_HEIGHT) {
+	if (position.x < 0 || position.x >= level_size.x || position.y < 0 || position.y >= level_size.y) {
 		return 1;
 	}
 
 	// Paredes indestrutíveis e áreas soterradas
-	switch (map[position.x][position.y]) {
+	switch (map[position.y][position.x]) {
 		case T_WALL:
 		case T_BURIED:
 			return 1;
@@ -311,7 +345,7 @@ void defrag_pool() {
 
 // Desenhar um quadrado em uma posição da matriz
 void draw_tile(Vec2 position, Color color) {
-	DrawRectangle(position.x * UNIT_LENGTH, position.y * UNIT_LENGTH, UNIT_LENGTH, UNIT_LENGTH, color);
+	DrawRectangle(position.x * unit_length, position.y * unit_length, unit_length, unit_length, color);
 }
 
 // Desenhar um inimigo na tela
