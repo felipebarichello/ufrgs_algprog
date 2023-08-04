@@ -20,6 +20,7 @@ void draw_enemy(Enemy* enemy, void*);
 Player player;
 Vec2 level_size;
 int unit_length;
+Vec2 screen_offset;
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 
@@ -158,7 +159,7 @@ void load_map(const char* file_name) {
 		// Deu certo. Abriu.
 		printf("Arquivo de mapa aberto com sucesso");
 
-		int i, j, line_start = 0, shortest_dimension;
+		int i, j, line_start = 0;
 		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
 		size_t bytes_read;
 
@@ -172,24 +173,36 @@ void load_map(const char* file_name) {
 
 		// Interpretar cada linha (até \n)
 		for (i = 0; line_start < bytes_read; i++) {
-			for (j = 0; map_buffer[line_start + j] != '\n'; j++) {
+			for (j = 0; map_buffer[line_start + j] != '\n' && line_start + j <= bytes_read; j++) {
 				map[i][j] = map_buffer[line_start + j];
+
+				if (j > 35) {
+					printf("\nj: %d", j);
+				}
 			}
 
 			// A largura do nível é setada várias vezes até a maior ser encontrada
 			if (j > level_size.x) {
-				level_size.x = j;
+				level_size.x = j - 1;
 			}
+
+			printf("\nw: %d", level_size.x);
 
 			line_start += j + 1;
 		}
 
 		level_size.y = i;
 
-		shortest_dimension = level_size.x < level_size.y ? level_size.x : level_size.y;
-
 		// O comprimento unitário é a menor largura de aresta de um tile que permite que o nível inteiro seja desenhado na tela
-		unit_length = GetScreenHeight() / shortest_dimension;
+		if (level_size.y < level_size.x) {
+			unit_length = GetScreenHeight() / level_size.y;
+			screen_offset.x = (GetScreenWidth() - level_size.x * unit_length) / 2;
+			screen_offset.y = 0;
+		} else {
+			unit_length = GetScreenWidth() / level_size.x;
+			screen_offset.x = 0;
+			screen_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
+		}
 	}
 }
 
@@ -345,7 +358,7 @@ void defrag_pool() {
 
 // Desenhar um quadrado em uma posição da matriz
 void draw_tile(Vec2 position, Color color) {
-	DrawRectangle(position.x * unit_length, position.y * unit_length, unit_length, unit_length, color);
+	DrawRectangle(position.x * unit_length + screen_offset.x, position.y * unit_length + screen_offset.y, unit_length, unit_length, color);
 }
 
 // Desenhar um inimigo na tela
