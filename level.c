@@ -45,9 +45,7 @@ void Level_Init() {
 
 	SetTargetFPS(FPS);
 
-	load_map("map.txt");
-
-	// Inicializar a pool de inimigos
+	// Inicializações
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
 	}
@@ -55,8 +53,7 @@ void Level_Init() {
 	enemy_pool.lower_bound = 0;
 	enemy_pool.upper_bound = 0;
 
-	// Ler o arquivo do mapa
-	//load_map("map.txt");
+	load_map("map.txt");
 	
 	// Spawnar entidades baseado no mapa
 	for (i = 0; i < level_size.y; i++) {
