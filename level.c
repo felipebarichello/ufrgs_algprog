@@ -8,7 +8,7 @@
 #include "level_lib.h"
 #include "level_consts.h"
 
-#define frames(millis) millis * FPS / 1000
+#define millis2frames(millis) millis * FPS / 1000
 #define matrix_to_screen(pos, axis) pos.axis * unit_length + level_offset.axis
 #define matrix_to_screen_v(vec) AddVec2(ScaleVec2(vec, unit_length), level_offset)
 
@@ -55,7 +55,7 @@ EnemyPool initial_enemy_pool;
 Vec2 initial_player_position;
 Vec2 player_position;
 
-char bullet_active;
+int bullet_lifetime;
 Vector2 bullet_position;
 Vector2 bullet_velocity;
 int bullet_cooldown;
@@ -74,7 +74,7 @@ void Level_Init() {
 
 	sight_radius = BASE_SIGHT_RADIUS;
 
-	bullet_active = 0;
+	bullet_lifetime = 0;
 	bullet_cooldown = 0;
 	bullet_speed = BULLET_SPEED / FPS;
 
@@ -127,17 +127,21 @@ void Level_Update() {
 
 	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
 		if (bullet_cooldown <= 0) {
+			/* Atirar */
+
 			Vec2 mouse_pos = { GetMouseX(), GetMouseY() };
 			Vec2 mouse_diff = SubVec2(mouse_pos, matrix_to_screen_v(player_position));
 
-			bullet_active = 1;
 			bullet_position = Vector2_from_Vec2(AddVec2(matrix_to_screen_v(player_position), (Vec2){unit_length/2, unit_length/2}));
 			bullet_velocity = ScaleVector2(NormalizeVector2(Vector2_from_Vec2(mouse_diff)), bullet_speed);
-			bullet_cooldown = frames(SHOT_COOLDOWN);
+			bullet_cooldown = millis2frames(SHOT_COOLDOWN);
+			bullet_lifetime = millis2frames(BULLET_LIFETIME);
 		}
 	}
 
-	if (bullet_active) {
+	// Se a bala estiver ativa
+	if (bullet_lifetime > 0) {
+		bullet_lifetime--;
 		bullet_position = AddVector2(bullet_position, bullet_velocity);
 	}
 
@@ -224,8 +228,8 @@ void Level_Draw() {
 	// Desenhar o jogador
 	draw_tile(player_position, COLOR_PLAYER);
 
-	// Desenhar tiro
-	if (bullet_active) {
+	// Desenhar tiro (se estiver ativo)
+	if (bullet_lifetime > 0) {
 		BeginRotation(bullet_position, Vector2Angle(bullet_velocity) * RAD2DEG);
 			DrawEllipse(0, 0, 10, 3, COLOR_BULLET);
 		EndRotation();
@@ -330,7 +334,7 @@ int spawn_enemy(Vec2 position) {
 	enemy = &enemy_pool.pool[enemy_pool.upper_bound];
 	enemy->enemy.position = position;
 	enemy->enemy.direction = (Vec2){0, 0};
-	enemy->enemy.move_cooldown = frames(INITIAL_MOVE_COOLDOWN);
+	enemy->enemy.move_cooldown = millis2frames(INITIAL_MOVE_COOLDOWN);
 	enemy->active = 1;
 }
 
@@ -407,7 +411,7 @@ void update_enemy(Enemy* enemy, void* _) {
 
 			if (!args.is_any_enemy_at) {
 				enemy->position = target_position;
-				enemy->move_cooldown = GetRandomValue(frames(MIN_ENEMY_MOVE_COOLDOWN), frames(MAX_ENEMY_MOVE_COOLDOWN));
+				enemy->move_cooldown = GetRandomValue(millis2frames(MIN_ENEMY_MOVE_COOLDOWN), millis2frames(MAX_ENEMY_MOVE_COOLDOWN));
 
 				// Se direção for uma diagonal, cooldown é multiplicado por raíz de dois
 				if (enemy->direction.x * enemy->direction.x * enemy->direction.y * enemy->direction.y == 1) {
