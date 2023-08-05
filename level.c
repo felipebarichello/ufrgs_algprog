@@ -331,12 +331,9 @@ void update_enemy(Enemy* enemy, void* _) {
 
 // Verificar se a posição é visível pelo jogador
 char is_in_sight(Vec2 pos) {
-	Vec2 difference = SubVec2(pos, player.position);
-	char in_sight =
-		   abs(difference.x) < sight_radius
-		&& abs(difference.y) < sight_radius;
+	int distance = Vec2Magnitude(SubVec2(pos, player.position));
 
-	if (in_sight) return 1;
+	if (distance < sight_radius) return 1;
 	else return 0;
 }
 
