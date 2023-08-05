@@ -151,14 +151,15 @@ void load_map(const char* file_name) {
 	// https://learn.microsoft.com/pt-br/cpp/c-runtime-library/reference/fopen-s-wfopen-s?view=msvc-170
 	if (fopen_s(&file, file_name, "rb") != 0) {
 		// Deu erro. Não abriu.
-		printf("Falha ao abrir o arquivo de mapa");
+		printf("Falha ao abrir o arquivo de mapa\n");
 	} else {
-		// Deu certo. Abriu.
-		printf("Arquivo de mapa aberto com sucesso");
-
 		int i, j, line_start = 0;
 		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
 		size_t bytes_read;
+		Vec2 min_unit_length;
+
+		// Deu certo. Abriu.
+		printf("Arquivo de mapa aberto com sucesso\n");
 
 		// Ler todo o mapa que o arquivo continha (com um máximo)
 		// 1 é somado a MAX_LEVEL_WIDTH porque o \n é um caractere que não é um elemento
@@ -184,16 +185,22 @@ void load_map(const char* file_name) {
 
 		level_size.y = i;
 
+		/* Definir o comprimento unitário e o offset da tela */
+
+		min_unit_length.x = GetScreenWidth()  / level_size.x; // Variável auxiliar. Mínimo para a largura ser satisfeita
+		min_unit_length.y = GetScreenHeight() / level_size.y; // Mínimo para a altura ser satisfeita
+
 		// O comprimento unitário é a menor largura de aresta de um tile que permite que o nível inteiro seja desenhado na tela
-		if (level_size.y < level_size.x) {
-			unit_length = GetScreenHeight() / level_size.y;
-			screen_offset.x = (GetScreenWidth() - level_size.x * unit_length) / 2;
-			screen_offset.y = 0;
+		if (min_unit_length.y > min_unit_length.x) {
+			// O comprimento unitário se torna o menor entre os dois mínimos
+			unit_length = min_unit_length.x;
 		} else {
-			unit_length = GetScreenWidth() / level_size.x;
-			screen_offset.x = 0;
-			screen_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
+			unit_length = min_unit_length.y;
 		}
+
+		// O offset serve para centralizar o jogo na tela, deixando bordas pretas quando necessário
+		screen_offset.x = (GetScreenWidth()  - level_size.x * unit_length) / 2;
+		screen_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
 	}
 }
 
