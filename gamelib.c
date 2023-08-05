@@ -81,3 +81,18 @@ Vector2 NormalizeVector2(Vector2 vec) {
 float Vector2Magnitude(Vector2 vec) {
 	return (float)sqrt(vec.x * vec.x + vec.y * vec.y);
 }
+
+float Vector2Angle(Vector2 vec) {
+	return atan2f(vec.y, vec.x);
+}
+
+
+void BeginRotation(Vector2 translation, float angle) {
+	rlPushMatrix();
+	rlTranslatef(translation.x, translation.y, 0);
+	rlRotatef(angle, 0, 0, 1);
+}
+
+void EndRotation() {
+	rlPopMatrix();
+}

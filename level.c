@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "gamelib.h"
 #include "level_lib.h"
 #include "level_consts.h"
@@ -187,7 +188,9 @@ void Level_Draw() {
 
 	// Desenhar tiro
 	if (bullet_active) {
-		DrawCircle(bullet_position.x, bullet_position.y, unit_length / 4.0, COLOR_BULLET);
+		BeginRotation(bullet_position, Vector2Angle(bullet_velocity) * RAD2DEG);
+			DrawEllipse(0, 0, 10, 3, COLOR_BULLET);
+		EndRotation();
 	}
 }
 

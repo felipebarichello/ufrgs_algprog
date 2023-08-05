@@ -23,7 +23,7 @@ int main() {
 		Level_Update(); // Implementado por game.c
 
 		BeginDrawing();
-		Level_Draw(); // Implementado por game.c
+			Level_Draw(); // Implementado por game.c
 		EndDrawing();
 	}
 

@@ -54,4 +54,26 @@ Vector2 DivideVector2(Vector2, float);
 // Normalizar o vetor magnitude 1
 Vector2 NormalizeVector2(Vector2);
 
+// Calcular a magnitude do vetor
 float Vector2Magnitude(Vector2);
+
+float Vector2Angle(Vector2);
+
+
+// Rotaciona tudo o que é desenhado antes de `EndRotation()`
+// Deve sempre ser chamado em conjunto com `EndRotation()`, senão coisas ruins acontecem 😈
+// O ângulo é em graus
+// `translation` é a posição na tela
+// Colocar uma posição diferente de zero em qualquer desenho significa um offset do PONTO DE ORIGEM
+// Por exemplo, caso queira manter a origem de um retângulo, mas quer rotacioná-lo 45 graus para cima, faça assim:
+//
+// ```
+// BeginRotation(position, -45);
+//     DrawRectangle(0, 0, width, length, color);
+// EndRotation();
+// ```
+void BeginRotation(Vector2 translation, float angle);
+
+// Encerra a rotação
+// Deve sempre ser chamada após `BeginRotation()`
+void EndRotation();
