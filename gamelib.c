@@ -10,6 +10,10 @@ Vec2 Vec2_from_Vector2(Vector2 vector) {
 	return vec;
 }
 
+char Vec2Equals(Vec2 a, Vec2 b) {
+	return a.x == b.x && a.y == b.y;
+}
+
 Vec2 AddVec2(Vec2 a, Vec2 b) {
 	a.x += b.x;
 	a.y += b.y;

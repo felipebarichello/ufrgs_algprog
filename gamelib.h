@@ -18,6 +18,9 @@ typedef struct {
 // Criar um Vector2 a partir de um Vec2
 Vec2 Vec2_from_Vector2(Vector2);
 
+// Testar equivalência entre dois Vec2
+char Vec2Equals(Vec2, Vec2);
+
 // Adicionar dois Vec2
 Vec2 AddVec2(Vec2, Vec2);
 

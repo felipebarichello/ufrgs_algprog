@@ -14,6 +14,11 @@ typedef struct {
 	int move_cooldown;
 } Enemy;
 
+typedef struct {
+	Enemy enemy;
+	char active; // Booleana para o estado do inimigo
+} PooledEnemy;
+
 typedef enum {
 	T_EMPTY    = 0,   // Ausência de tile. Todos os outros códigos inválidos também são considerados vazios.
 

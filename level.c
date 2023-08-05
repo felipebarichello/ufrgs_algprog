@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 #include "gamelib.h"
 #include "level_lib.h"
 #include "level_consts.h"
@@ -12,16 +13,24 @@
 #define matrix_to_screen_v(vec) AddVec2(ScaleVec2(vec, unit_length), level_offset)
 
 
+typedef struct {
+	Vec2 position;
+	char is_any_enemy_at;
+} is_enemy_at_Args;
+
 void load_map(const char* file_name);
 char is_in_bounds(Vec2 position);
 char is_on_tile(Vec2 pos, Tile tile);
 int spawn_enemy(Vec2 position);
 void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
 void update_enemy(Enemy* enemy, void*);
-char is_in_sight(Vec2 pos);
+void is_enemy_at(Enemy* enemy, is_enemy_at_Args* args);
+void player_enemy_collision();
 void defrag_pool();
+char is_in_sight(Vec2 pos);
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
+
 
 Vec2 level_size, level_offset;
 int unit_length, sight_radius;
@@ -30,19 +39,20 @@ char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 
 // Object pooling é uma técnica de armazenar os objetos em uma array finita já desde o começo,
 // reaproveitando os objetos já destruídos ou ainda não criados
-struct {
-	// O pool de fato
-	struct PooledEnemy {
-		Enemy enemy;
-		int active; // Booleana para o estado do inimigo
-	} pool[ENEMY_MAX];
+typedef struct {
+	// A pool de fato
+	PooledEnemy pool[ENEMY_MAX];
 
 	// Os bounds são para questões de performance.
 	// Atualizando-os, não precisaremos avaliar todos os inimigos para verificar seus estados
 	int lower_bound;
 	int upper_bound;
-} enemy_pool;
+} EnemyPool;
 
+EnemyPool enemy_pool;
+EnemyPool initial_enemy_pool;
+
+Vec2 initial_player_position;
 Vec2 player_position;
 
 char bullet_active;
@@ -50,6 +60,9 @@ Vector2 bullet_position;
 Vector2 bullet_velocity;
 int bullet_cooldown;
 float bullet_speed;
+
+char enemy_touches_player;
+
 
 // Chamada quando o jogo deve inicializar
 void Level_Init() {
@@ -64,6 +77,8 @@ void Level_Init() {
 	bullet_active = 0;
 	bullet_cooldown = 0;
 	bullet_speed = BULLET_SPEED / FPS;
+
+	enemy_touches_player = 0;
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
@@ -81,7 +96,7 @@ void Level_Init() {
 
 			switch (map[i][j]) {
 				case T_PLAYER:
-					player_position = matrix_position;
+					player_position = initial_player_position = matrix_position;
 					break;
 
 				case T_ENEMY:
@@ -90,6 +105,9 @@ void Level_Init() {
 			}
 		}
 	}
+
+	// Armazenar a pool de inimigos inicial para reset posterior
+	memcpy(&initial_enemy_pool, &enemy_pool, sizeof(EnemyPool));
 }
 
 // Chamada em cada frame antes de Draw()
@@ -128,12 +146,32 @@ void Level_Update() {
 	target_position = AddVec2(player_position, input_dir);
 
 	if (is_in_bounds(target_position) && !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)) {
+		is_enemy_at_Args args;
+
 		player_position = target_position;
+
+		args.is_any_enemy_at = 0;
+		args.position = player_position;
+
+		// Testar colisão com inimigos
+		foreach_enemy(&is_enemy_at, &args);
+
+		if (args.is_any_enemy_at) {
+			enemy_touches_player = 1;
+		}
 	}
 
 	/* Movimento do inimigo */
 
 	foreach_enemy(&update_enemy, NULL);
+
+	/* Colisões */
+
+	// Jogador e inimigo
+	if (enemy_touches_player) {
+		player_enemy_collision();
+		enemy_touches_player = 0;
+	}
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
@@ -258,22 +296,17 @@ void load_map(const char* file_name) {
 
 // Verificar se a posição está dentro do nível
 char is_in_bounds(Vec2 position) {
-	if (position.x < 0 || position.x >= level_size.x || position.y < 0 || position.y >= level_size.y) return 0;
-	else return 1;
+	return !(position.x < 0 || position.x >= level_size.x || position.y < 0 || position.y >= level_size.y);
 }
 
 // Verificar se a posição é de um tile de algum dos tipos especificados
 char is_on_tile(Vec2 pos, Tile tile) {
-	if (map[pos.y][pos.x] == tile) {
-		return 1;
-	}
-
-	return 0;
+	return map[pos.y][pos.x] == tile;
 }
 
 // Inicializar uma instância de inimigo em uma posição e atualizar a pool
 int spawn_enemy(Vec2 position) {
-	struct PooledEnemy* enemy;
+	PooledEnemy* enemy;
 
 	// Aqui, `upper_bound` pode se tornar igual a `lower_bound` ou sair para fora da array
 	enemy_pool.upper_bound++;
@@ -364,29 +397,53 @@ void update_enemy(Enemy* enemy, void* _) {
 
 		// Note que se não for possível mover, o cooldown não é resetado
 		if (is_in_bounds(target_position) && !is_on_tile(target_position, T_WALL)) {
-			enemy->position = target_position;
-			enemy->move_cooldown = GetRandomValue(frames(MIN_ENEMY_MOVE_COOLDOWN), frames(MAX_ENEMY_MOVE_COOLDOWN));
+			is_enemy_at_Args args;
 
-			// Se direção for uma diagonal, cooldown é multiplicado por raíz de dois
-			if (enemy->direction.x * enemy->direction.x * enemy->direction.y * enemy->direction.y == 1) {
-				enemy->move_cooldown = (int)(enemy->move_cooldown * SQRT_2);
+			args.is_any_enemy_at = 0;
+			args.position = target_position;
+
+			// Colidir com os outros inimigos
+			foreach_enemy(&is_enemy_at, &args);
+
+			if (!args.is_any_enemy_at) {
+				enemy->position = target_position;
+				enemy->move_cooldown = GetRandomValue(frames(MIN_ENEMY_MOVE_COOLDOWN), frames(MAX_ENEMY_MOVE_COOLDOWN));
+
+				// Se direção for uma diagonal, cooldown é multiplicado por raíz de dois
+				if (enemy->direction.x * enemy->direction.x * enemy->direction.y * enemy->direction.y == 1) {
+					enemy->move_cooldown = (int)(enemy->move_cooldown * SQRT_2);
+				}
+
+				// Testar se a nova posição encosta no jogador
+				if (Vec2Equals(enemy->position, player_position)) {
+					enemy_touches_player = 1;
+				}
 			}
 		}
 	}
 }
 
-// Verificar se a posição é visível pelo jogador
-char is_in_sight(Vec2 pos) {
-	int distance = Vec2Magnitude(SubVec2(pos, player_position));
+// O que acontece quando o jogador toca um inimigo
+void player_enemy_collision() {
+	// Resetar os inimigos
+	memcpy(&enemy_pool, &initial_enemy_pool, sizeof(EnemyPool));
 
-	if (distance < sight_radius) return 1;
-	else return 0;
+	// Resetar o jogador
+	player_position = initial_player_position;
+}
+
+// Verificar se o inimigo está na posição
+// Compatível com `foreach_enemy()`
+void is_enemy_at(Enemy* enemy, is_enemy_at_Args* args) {
+	if (Vec2Equals(enemy->position, args->position)) {
+		args->is_any_enemy_at = 1;
+	}
 }
 
 // Desfragmentar a pool de inimigos
 void defrag_pool() {
 	int i;
-	struct PooledEnemy defragged[ENEMY_MAX];
+	PooledEnemy defragged[ENEMY_MAX];
 
 	for (i = 0; i < ENEMY_MAX - enemy_pool.lower_bound; i++) {
 		defragged[i] = enemy_pool.pool[i + enemy_pool.lower_bound];
@@ -400,6 +457,12 @@ void defrag_pool() {
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i] = defragged[i];
 	}
+}
+
+// Verificar se a posição é visível pelo jogador
+char is_in_sight(Vec2 pos) {
+	int distance = Vec2Magnitude(SubVec2(pos, player_position));
+	return distance < sight_radius;
 }
 
 // Desenhar um quadrado em uma posição da matriz
