@@ -14,14 +14,14 @@ char is_on_tile(Vec2 pos, Tile tile);
 int spawn_enemy(Vec2 position);
 void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
 void update_enemy(Enemy* enemy, void*);
+char is_in_sight(Vec2 pos);
 void defrag_pool();
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
 
 Player player;
-Vec2 level_size;
-int unit_length;
-Vec2 screen_offset;
+Vec2 level_size, screen_offset;
+int unit_length, sight_radius;
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 
@@ -47,6 +47,8 @@ void Level_Init() {
 	SetTargetFPS(FPS);
 
 	// Inicializações
+	sight_radius = BASE_SIGHT_RADIUS;
+
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
 	}
@@ -131,6 +133,10 @@ void Level_Draw() {
 				case T_POWERUP:
 					draw_tile(pos, COLOR_POWERUP);
 					break;
+
+				// Vazio
+				default:
+					draw_tile(pos, COLOR_EMPTY);
 			}
 		}
 	}
@@ -317,12 +323,24 @@ void update_enemy(Enemy* enemy, void* _) {
 
 			// Se direção for uma diagonal, cooldown é multiplicado por raíz de dois
 			if (enemy->direction.x * enemy->direction.x * enemy->direction.y * enemy->direction.y == 1) {
-				enemy->move_cooldown *= SQRT_2;
+				enemy->move_cooldown = (int)(enemy->move_cooldown * SQRT_2);
 			}
 		}
 	}
 }
 
+// Verificar se a posição é visível pelo jogador
+char is_in_sight(Vec2 pos) {
+	Vec2 difference = SubVec2(pos, player.position);
+	char in_sight =
+		   abs(difference.x) < sight_radius
+		&& abs(difference.y) < sight_radius;
+
+	if (in_sight) return 1;
+	else return 0;
+}
+
+// Desfragmentar a pool de inimigos
 void defrag_pool() {
 	int i;
 	struct PooledEnemy defragged[ENEMY_MAX];
@@ -343,12 +361,16 @@ void defrag_pool() {
 
 // Desenhar um quadrado em uma posição da matriz
 void draw_tile(Vec2 position, Color color) {
-	DrawRectangle(position.x * unit_length + screen_offset.x, position.y * unit_length + screen_offset.y, unit_length, unit_length, color);
+	if (is_in_sight(position)) {
+		DrawRectangle(position.x * unit_length + screen_offset.x, position.y * unit_length + screen_offset.y, unit_length, unit_length, color);
+	}
 }
 
 // Desenhar um inimigo na tela
 // Compatível com `foreach_enemy()`
 // O parâmetro `_` é ignorado
 void draw_enemy(Enemy* enemy, void* _) {
-	draw_tile(enemy->position, COLOR_ENEMY);
+	if (is_in_sight(enemy->position)) {
+		draw_tile(enemy->position, COLOR_ENEMY);
+	}
 }

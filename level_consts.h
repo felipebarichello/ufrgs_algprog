@@ -8,10 +8,11 @@
 
 /* --- Visual --- */
 
+#define COLOR_EMPTY   GRAY
 #define COLOR_PLAYER  BLUE
 #define COLOR_ENEMY   RED
-#define COLOR_WALL    DARKGRAY
-#define COLOR_BURIED  GRAY
+#define COLOR_WALL    BLACK
+#define COLOR_BURIED  DARKBROWN
 #define COLOR_EMERALD GREEN
 #define COLOR_GOLD    GOLD
 #define COLOR_POWERUP PURPLE
@@ -24,6 +25,9 @@
 
 
 /* --- Jogo --- */
+
+// Jogador
+#define BASE_SIGHT_RADIUS 5 // Raio de visão base, sem powerups
 
 // Inimigo
 #define ENEMY_MAX 200                 // Máximo de inimigos na pool

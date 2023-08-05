@@ -1,6 +1,6 @@
 [x] Toupeira pode se mover por áreas soterradas
 	
-[ ] Fog of war (9x9) - 
+[x] Fog of war (9x9) - 
 
 [ ] 3 vidas
     [] Perder vida = reset inimigos vivos e jogador; apenas
