@@ -152,7 +152,7 @@ void load_map(const char* file_name) {
 	// https://learn.microsoft.com/pt-br/cpp/c-runtime-library/reference/fopen-s-wfopen-s?view=msvc-170
 	if (fopen_s(&file, file_name, "rb") != 0) {
 		// Deu erro. Não abriu.
-		printf("Falha ao abrir o arquivo de mapa\n");
+		printf("ERRO: Falha ao carregar mapa\n");
 	} else {
 		int i, j, line_start = 0;
 		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
@@ -160,7 +160,6 @@ void load_map(const char* file_name) {
 		Vec2 min_unit_length;
 
 		// Deu certo. Abriu.
-		printf("Arquivo de mapa aberto com sucesso\n");
 
 		// Ler todo o mapa que o arquivo continha (com um máximo)
 		// 1 é somado a MAX_LEVEL_WIDTH porque o \n é um caractere que não é um elemento

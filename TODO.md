@@ -1,4 +1,4 @@
-[ ] Toupeira pode se mover por áreas soterradas
+[x] Toupeira pode se mover por áreas soterradas
 	
 [ ] Fog of war (9x9) - 
 
