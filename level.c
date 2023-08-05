@@ -19,7 +19,6 @@ void defrag_pool();
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
 
-Player player;
 Vec2 level_size, screen_offset;
 int unit_length, sight_radius;
 
@@ -39,6 +38,8 @@ struct {
 	int lower_bound;
 	int upper_bound;
 } enemy_pool;
+
+Vec2 player_position;
 
 // Chamada quando o jogo deve inicializar
 void Level_Init() {
@@ -65,7 +66,7 @@ void Level_Init() {
 
 			switch (map[i][j]) {
 				case T_PLAYER:
-					player.position = matrix_position;
+					player_position = matrix_position;
 					break;
 
 				case T_ENEMY:
@@ -87,10 +88,10 @@ void Level_Update() {
 	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) input_dir.x++;
 
 	// Movimento do jogador
-	target_position = AddVec2(player.position, input_dir);
+	target_position = AddVec2(player_position, input_dir);
 
 	if (is_in_bounds(target_position) && !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)) {
-		player.position = target_position;
+		player_position = target_position;
 	}
 
 	// Movimento do inimigo
@@ -145,7 +146,7 @@ void Level_Draw() {
 	foreach_enemy(&draw_enemy, NULL);
 
 	// Desenhar o jogador
-	draw_tile(player.position, COLOR_PLAYER);
+	draw_tile(player_position, COLOR_PLAYER);
 }
 
 void load_map(const char* file_name) {
@@ -297,16 +298,16 @@ void update_enemy(Enemy* enemy, void* _) {
 		if (rand() < RAND_MAX * ENEMY_REDIRECT_CHANCE) {
 			// Implementar: quanto mais próximo do jogador, mais bias ele tem de ir pro lado dele
 		
-			//Vec2 vector_distance = SubVec2(enemy->direction, player.position);
-			//Vec2 bias = {1000, 1000};
+			// Vec2 vector_distance = SubVec2(enemy->direction, player_position);
+			// Vec2 bias = {1000, 1000};
 
-			//bias.x /= vector_distance.x + 4;
-			//bias.y /= vector_distance.y + 4;
+			// bias.x /= vector_distance.x + 4;
+			// bias.y /= vector_distance.y + 4;
 
-			//do {
-			//	enemy->direction.x = GetRandomValue(-vector_distance.x * vector_distance.x, vector_distance.);
-			//	enemy->direction.y = GetRandomValue(-vector_distance.x, vector_distance.y);
-			//} while (enemy->direction.x == 0 && enemy->direction.y == 0);
+			// do {
+			//  	enemy->direction.x = GetRandomValue(-vector_distance.x * vector_distance.x, vector_distance.);
+			//  	enemy->direction.y = GetRandomValue(-vector_distance.x, vector_distance.y);
+			// } while (enemy->direction.x == 0 && enemy->direction.y == 0);
 			
 			do {
 				enemy->direction.x = GetRandomValue(-1, 1);
@@ -331,7 +332,7 @@ void update_enemy(Enemy* enemy, void* _) {
 
 // Verificar se a posição é visível pelo jogador
 char is_in_sight(Vec2 pos) {
-	int distance = Vec2Magnitude(SubVec2(pos, player.position));
+	int distance = Vec2Magnitude(SubVec2(pos, player_position));
 
 	if (distance < sight_radius) return 1;
 	else return 0;

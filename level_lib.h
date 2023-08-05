@@ -3,10 +3,6 @@
 #include "gamelib.h"
 
 typedef struct {
-	Vec2 position;
-} Player;
-
-typedef struct {
 	// Posição do inimigo da matriz
 	Vec2 position;
 
