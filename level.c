@@ -9,7 +9,8 @@
 #define frames(millis) millis * FPS / 1000
 
 void load_map(const char* file_name);
-char is_solid(Vec2 position);
+char is_in_bounds(Vec2 position);
+char is_on_tile(Vec2 pos, Tile tile);
 int spawn_enemy(Vec2 position);
 void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
 void update_enemy(Enemy* enemy, void*);
@@ -86,7 +87,7 @@ void Level_Update() {
 	// Movimento do jogador
 	target_position = AddVec2(player.position, input_dir);
 
-	if (!is_solid(target_position)) {
+	if (is_in_bounds(target_position) && !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)) {
 		player.position = target_position;
 	}
 
@@ -204,31 +205,19 @@ void load_map(const char* file_name) {
 	}
 }
 
-// Verificar se a posição possui um tile sólido e não pode ser atravessada
-// Para ver os tiles considerados sólidos, ver `level_lib.h`
-char is_solid(Vec2 position) {
-	Tile tile;
+// Verificar se a posição está dentro do nível
+char is_in_bounds(Vec2 position) {
+	if (position.x < 0 || position.x >= level_size.x || position.y < 0 || position.y >= level_size.y) return 0;
+	else return 1;
+}
 
-	// Bordas do nível
-	if (position.x < 0 || position.x >= level_size.x || position.y < 0 || position.y >= level_size.y) {
+// Verificar se a posição é de um tile de algum dos tipos especificados
+char is_on_tile(Vec2 pos, Tile tile) {
+	if (map[pos.y][pos.x] == tile) {
 		return 1;
 	}
 
-	// Paredes indestrutíveis e áreas soterradas
-	switch (map[position.y][position.x]) {
-		case T_WALL:
-		case T_BURIED:
-			return 1;
-	}
-
 	return 0;
-}
-
-// Mover um objeto sólido caso não hajam outros objetos sólidos no local
-void try_move(Vec2* current, Vec2 target) {
-	if (!is_solid(target)) {
-		*current = target;
-	}
 }
 
 // Inicializar uma instância de inimigo em uma posição e atualizar a pool
@@ -323,9 +312,8 @@ void update_enemy(Enemy* enemy, void* _) {
 		target_position = AddVec2(enemy->position, enemy->direction);
 
 		// Note que se não for possível mover, o cooldown não é resetado
-		if (!is_solid(target_position)) {
+		if (is_in_bounds(target_position) && !is_on_tile(target_position, T_WALL)) {
 			enemy->position = target_position;
-
 			enemy->move_cooldown = GetRandomValue(frames(MIN_ENEMY_MOVE_COOLDOWN), frames(MAX_ENEMY_MOVE_COOLDOWN));
 
 			// Se direção for uma diagonal, cooldown é multiplicado por raíz de dois
