@@ -10,7 +10,7 @@
     Ouro - 50
     Touperia - 200
 
-[ ] Tiro
+[x] Tiro
     Único
     [ ] Abre área soterrada
 
