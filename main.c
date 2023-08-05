@@ -20,10 +20,6 @@ int main() {
 	Level_Init(); // Implementado por game.c
 
 	while (!WindowShouldClose()) {
-		if (IsKeyPressed(KEY_F11)) {
-			ToggleFullscreen();
-		}
-
 		Level_Update(); // Implementado por game.c
 
 		BeginDrawing();
