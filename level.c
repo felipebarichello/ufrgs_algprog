@@ -7,6 +7,9 @@
 #include "level_consts.h"
 
 #define frames(millis) millis * FPS / 1000
+#define matrix_to_screen(pos, axis) pos.axis * unit_length + level_offset.axis
+#define matrix_to_screen_v(vec) AddVec2(ScaleVec2(vec, unit_length), level_offset)
+
 
 void load_map(const char* file_name);
 char is_in_bounds(Vec2 position);
@@ -19,7 +22,7 @@ void defrag_pool();
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(Enemy* enemy, void*);
 
-Vec2 level_size, screen_offset;
+Vec2 level_size, level_offset;
 int unit_length, sight_radius;
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
@@ -41,14 +44,25 @@ struct {
 
 Vec2 player_position;
 
+char bullet_active;
+Vector2 bullet_position;
+Vector2 bullet_velocity;
+int bullet_cooldown;
+float bullet_speed;
+
 // Chamada quando o jogo deve inicializar
 void Level_Init() {
 	int i, j;
 
 	SetTargetFPS(FPS);
 
-	// Inicializações
+	/* Inicializações */
+
 	sight_radius = BASE_SIGHT_RADIUS;
+
+	bullet_active = 0;
+	bullet_cooldown = 0;
+	bullet_speed = BULLET_SPEED / FPS;
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
@@ -79,22 +93,45 @@ void Level_Init() {
 
 // Chamada em cada frame antes de Draw()
 void Level_Update() {
-	Vec2 input_dir = {0, 0}, target_position;
+	Vec2 input_dir = { 0, 0 }, target_position;
 
-	// Lidar com input
+	/* Input de movimento */
+
 	if (IsKeyPressed(KEY_UP)    || IsKeyPressed(KEY_W)) input_dir.y--;
 	if (IsKeyPressed(KEY_DOWN)  || IsKeyPressed(KEY_S)) input_dir.y++;
 	if (IsKeyPressed(KEY_LEFT)  || IsKeyPressed(KEY_A)) input_dir.x--;
 	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) input_dir.x++;
 
-	// Movimento do jogador
+	/* Tiro */
+
+	bullet_cooldown--;
+
+	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
+		if (bullet_cooldown <= 0) {
+			Vec2 mouse_pos = { GetMouseX(), GetMouseY() };
+			Vec2 mouse_diff = SubVec2(mouse_pos, matrix_to_screen_v(player_position));
+
+			bullet_active = 1;
+			bullet_position = Vector2_from_Vec2(AddVec2(matrix_to_screen_v(player_position), (Vec2){unit_length/2, unit_length/2}));
+			bullet_velocity = ScaleVector2(NormalizeVector2(Vector2_from_Vec2(mouse_diff)), bullet_speed);
+			bullet_cooldown = frames(SHOT_COOLDOWN);
+		}
+	}
+
+	if (bullet_active) {
+		bullet_position = AddVector2(bullet_position, bullet_velocity);
+	}
+
+	/* Movimento do jogador */
+
 	target_position = AddVec2(player_position, input_dir);
 
 	if (is_in_bounds(target_position) && !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)) {
 		player_position = target_position;
 	}
 
-	// Movimento do inimigo
+	/* Movimento do inimigo */
+
 	foreach_enemy(&update_enemy, NULL);
 }
 
@@ -147,6 +184,11 @@ void Level_Draw() {
 
 	// Desenhar o jogador
 	draw_tile(player_position, COLOR_PLAYER);
+
+	// Desenhar tiro
+	if (bullet_active) {
+		DrawCircle(bullet_position.x, bullet_position.y, unit_length / 4.0, COLOR_BULLET);
+	}
 }
 
 void load_map(const char* file_name) {
@@ -206,8 +248,8 @@ void load_map(const char* file_name) {
 		}
 
 		// O offset serve para centralizar o jogo na tela, deixando bordas pretas quando necessário
-		screen_offset.x = (GetScreenWidth()  - level_size.x * unit_length) / 2;
-		screen_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
+		level_offset.x = (GetScreenWidth()  - level_size.x * unit_length) / 2;
+		level_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
 	}
 }
 
@@ -360,7 +402,7 @@ void defrag_pool() {
 // Desenhar um quadrado em uma posição da matriz
 void draw_tile(Vec2 position, Color color) {
 	if (is_in_sight(position)) {
-		DrawRectangle(position.x * unit_length + screen_offset.x, position.y * unit_length + screen_offset.y, unit_length, unit_length, color);
+		DrawRectangle(matrix_to_screen(position, x), matrix_to_screen(position, y), unit_length, unit_length, color);
 	}
 }
 

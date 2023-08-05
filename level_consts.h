@@ -8,14 +8,18 @@
 
 /* --- Visual --- */
 
+// Tiles
 #define COLOR_EMPTY   GRAY
-#define COLOR_PLAYER  BLUE
-#define COLOR_ENEMY   RED
 #define COLOR_WALL    BLACK
 #define COLOR_BURIED  DARKBROWN
 #define COLOR_EMERALD GREEN
 #define COLOR_GOLD    GOLD
 #define COLOR_POWERUP PURPLE
+
+// Entidades
+#define COLOR_PLAYER  BLUE
+#define COLOR_ENEMY   RED
+#define COLOR_BULLET  PINK
 
 
 /* --- Tamanhos --- */
@@ -27,7 +31,10 @@
 /* --- Jogo --- */
 
 // Jogador
-#define BASE_SIGHT_RADIUS 5 // Raio de visão base, sem powerups
+#define BASE_SIGHT_RADIUS   5 // Raio de visão base, sem powerups
+#define BULLET_LIFETIME   100 // Tempo de vida de um tiro
+#define SHOT_COOLDOWN     100 // Delay entre tiros
+#define BULLET_SPEED      400 // Velocidade da bala
 
 // Inimigo
 #define ENEMY_MAX 200                 // Máximo de inimigos na pool
