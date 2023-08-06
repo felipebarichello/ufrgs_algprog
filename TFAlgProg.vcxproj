@@ -149,6 +149,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="debug.h" />
     <ClCompile Include="gamelib.c" />
     <ClCompile Include="level_consts.h" />
     <ClCompile Include="main.c" />

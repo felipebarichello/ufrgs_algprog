@@ -7,6 +7,7 @@
 #include "gamelib.h"
 #include "level_lib.h"
 #include "level_consts.h"
+#include "debug.h"
 
 #define millis2frames(millis) millis * FPS / 1000
 #define matrix_to_screen(pos, axis) pos.axis * unit_length + level_offset.axis
@@ -126,7 +127,10 @@ void Level_Update() {
 	bullet_cooldown--;
 
 	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
-		if (bullet_cooldown <= 0) {
+		#if (!DEBUG_BULLET_NOCOOLDOWN)
+		if (bullet_cooldown <= 0)
+		#endif
+		{
 			/* Atirar */
 
 			Vec2 mouse_pos = { GetMouseX(), GetMouseY() };
@@ -173,7 +177,10 @@ void Level_Update() {
 
 	// Jogador e inimigo
 	if (enemy_touches_player) {
+		#if (!DEBUG_INVINCIBILITY)
 		player_enemy_collision();
+		#endif
+
 		enemy_touches_player = 0;
 	}
 }
@@ -410,7 +417,10 @@ void update_enemy(Enemy* enemy, void* _) {
 			foreach_enemy(&is_enemy_at, &args);
 
 			if (!args.is_any_enemy_at) {
+				#if (!DEBUG_ENEMY_CANTMOVE)
 				enemy->position = target_position;
+				#endif			
+
 				enemy->move_cooldown = GetRandomValue(millis2frames(MIN_ENEMY_MOVE_COOLDOWN), millis2frames(MAX_ENEMY_MOVE_COOLDOWN));
 
 				// Se direção for uma diagonal, cooldown é multiplicado por raíz de dois
@@ -465,6 +475,10 @@ void defrag_pool() {
 
 // Verificar se a posição é visível pelo jogador
 char is_in_sight(Vec2 pos) {
+	#if (DEBUG_NIGHTVISION)
+	return 1;
+	#endif
+
 	int distance = Vec2Magnitude(SubVec2(pos, player_position));
 	return distance < sight_radius;
 }

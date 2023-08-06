@@ -29,6 +29,9 @@
     <ClCompile Include="level_consts.h">
       <Filter>Source files\Scenes\Level</Filter>
     </ClCompile>
+    <ClCompile Include="debug.h">
+      <Filter>Source files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="level.h">
