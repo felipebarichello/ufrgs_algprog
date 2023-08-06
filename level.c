@@ -26,6 +26,7 @@ char is_on_tile(Vec2 pos, Tile tile);
 int spawn_enemy(Vec2 position);
 void foreach_enemy(void (*callback)(PooledEnemy* enemy, void* context), void* context);
 void update_enemy(PooledEnemy* pooled_enemy, void*);
+void update_bullet();
 void is_enemy_at(PooledEnemy* enemy, is_enemy_at_Args* args);
 void player_enemy_collision();
 void defrag_pool();
@@ -145,10 +146,9 @@ void Level_Update() {
 		}
 	}
 
-	// Se a bala estiver ativa
+	// Se a bala estiver ativa, atualizar seu estado
 	if (bullet_lifetime > 0) {
-		bullet_lifetime--;
-		bullet_position = AddVector2(bullet_position, bullet_velocity);
+		update_bullet();
 	}
 
 	/* Movimento do jogador */
@@ -447,6 +447,21 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 			}
 		}
 	}
+
+	/* Colidir com tiro */
+	enemy_hitbox = (Rectangle){ matrix_to_screen(enemy->position,x), matrix_to_screen(enemy->position,y), unit_length, unit_length };
+	bullet_hitbox = (Rectangle){ bullet_position.x, bullet_position.y, bullet_size.x, bullet_size.x };
+
+	if (bullet_lifetime > 0 && CheckCollisionRecs(enemy_hitbox, bullet_hitbox)) {
+		pooled_enemy->active = 0;
+		bullet_lifetime = 0;
+	}
+}
+
+// Atualizar o estado da bala
+void update_bullet() {
+	bullet_lifetime--;
+	bullet_position = AddVector2(bullet_position, bullet_velocity);
 }
 
 // O que acontece quando o jogador toca um inimigo
