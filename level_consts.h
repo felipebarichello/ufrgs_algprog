@@ -1,4 +1,5 @@
 #include "gamelib.h"
+#include "debug.h"
 
 
 /* --- Computador --- */
@@ -22,7 +23,7 @@
 #define COLOR_BULLET  PINK
 
 
-/* --- Tamanhos --- */
+/* --- Nível --- */
 
 #define MAX_LEVEL_WIDTH  100
 #define MAX_LEVEL_HEIGHT 100
@@ -31,7 +32,7 @@
 /* --- Jogo --- */
 
 // Jogador
-#define BASE_SIGHT_RADIUS   5  // Raio de visão base, sem powerups
+#define BASE_SIGHT_RADIUS 5    // Raio de visão base, sem powerups
 #define BULLET_LIFETIME   1000 // Tempo de vida de um tiro
 #define SHOT_COOLDOWN     2000 // Delay entre tiros
 #define BULLET_SPEED      400  // Velocidade da bala

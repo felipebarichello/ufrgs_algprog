@@ -2,7 +2,7 @@
 
 #include <math.h>
 
-Vec2 Vec2_from_Vector2(Vector2 vector) {
+Vec2 Vec2FromVector2(Vector2 vector) {
 	Vec2 vec;
 
 	vec.x = (int)vector.x;
@@ -46,7 +46,7 @@ int Vec2Magnitude(Vec2 vec) {
 	return (int)sqrt(vec.x * vec.x + vec.y * vec.y);
 }
 
-Vector2 Vector2_from_Vec2(Vec2 vec) {
+Vector2 Vector2FromVec2(Vec2 vec) {
 	Vector2 vector;
 
 	vector.x = (float)vec.x;

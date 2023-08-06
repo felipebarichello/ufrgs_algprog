@@ -15,8 +15,8 @@ typedef struct {
 	int x, y;
 } Vec2;
 
-// Criar um Vector2 a partir de um Vec2
-Vec2 Vec2_from_Vector2(Vector2);
+// Criar um Vector2 a partir de um Vec2, truncando as casas decimais
+Vec2 Vec2FromVector2(Vector2);
 
 // Testar equivalência entre dois Vec2
 char Vec2Equals(Vec2, Vec2);
@@ -40,7 +40,7 @@ Vec2 NormalizeVec2(Vec2);
 int Vec2Magnitude(Vec2);
 
 // Criar um Vector2 a partir de um Vec2
-Vector2 Vector2_from_Vec2(Vec2);
+Vector2 Vector2FromVec2(Vec2);
 
 // Adicionar dois Vector2
 Vector2 AddVector2(Vector2, Vector2);

@@ -136,8 +136,8 @@ void Level_Update() {
 			Vec2 mouse_pos = { GetMouseX(), GetMouseY() };
 			Vec2 mouse_diff = SubVec2(mouse_pos, matrix_to_screen_v(player_position));
 
-			bullet_position = Vector2_from_Vec2(AddVec2(matrix_to_screen_v(player_position), (Vec2){unit_length/2, unit_length/2}));
-			bullet_velocity = ScaleVector2(NormalizeVector2(Vector2_from_Vec2(mouse_diff)), bullet_speed);
+			bullet_position = Vector2FromVec2(AddVec2(matrix_to_screen_v(player_position), (Vec2){unit_length/2, unit_length/2}));
+			bullet_velocity = ScaleVector2(NormalizeVector2(Vector2FromVec2(mouse_diff)), bullet_speed);
 			bullet_cooldown = millis2frames(SHOT_COOLDOWN);
 			bullet_lifetime = millis2frames(BULLET_LIFETIME);
 		}
@@ -374,7 +374,7 @@ void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context)
 	}
 }
 
-// Mover o inimigo
+// Atualizar o estado de um inimigo
 // Compatível com `foreach_enemy()`
 // O parâmetro `_` é ignorado
 void update_enemy(Enemy* enemy, void* _) {
@@ -413,7 +413,7 @@ void update_enemy(Enemy* enemy, void* _) {
 			args.is_any_enemy_at = 0;
 			args.position = target_position;
 
-			// Colidir com os outros inimigos
+			// Colisão com os outros inimigos
 			foreach_enemy(&is_enemy_at, &args);
 
 			if (!args.is_any_enemy_at) {

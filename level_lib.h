@@ -27,8 +27,8 @@ typedef enum {
 	T_ENEMY   = 'T', // Cada inimigo
 
 	// Sólidos
-	T_WALL    = '#', // Paredes          [Sólido, indestrutível]
-	T_BURIED  = 'S', // Áreas soterradas [Sólido, destrutível]
+	T_WALL    = '#', // Paredes
+	T_BURIED  = 'S', // Áreas soterradas
 	
 	// Consumíveis
 	T_EMERALD = 'E', // Esmeralda
