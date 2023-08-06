@@ -36,6 +36,8 @@
 #define BULLET_LIFETIME   1000 // Tempo de vida de um tiro
 #define SHOT_COOLDOWN     2000 // Delay entre tiros
 #define BULLET_SPEED      400  // Velocidade da bala
+#define BULLET_LENGTH     1.f  // Comprimento visual e da hitbox da bala
+#define BULLET_DIAMETER   .3f  // Diâmetro visual e da hitbox da bala
 
 // Inimigo
 #define ENEMY_MAX 200                 // Máximo de inimigos na pool

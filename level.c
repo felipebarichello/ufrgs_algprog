@@ -20,6 +20,7 @@ typedef struct {
 } is_enemy_at_Args;
 
 void load_map(const char* file_name);
+void set_unit_length(int length);
 char is_in_bounds(Vec2 position);
 char is_on_tile(Vec2 pos, Tile tile);
 int spawn_enemy(Vec2 position);
@@ -61,6 +62,7 @@ Vector2 bullet_position;
 Vector2 bullet_velocity;
 int bullet_cooldown;
 float bullet_speed;
+Vec2 bullet_size;
 
 char enemy_touches_player;
 
@@ -238,7 +240,7 @@ void Level_Draw() {
 	// Desenhar tiro (se estiver ativo)
 	if (bullet_lifetime > 0) {
 		BeginRotation(bullet_position, Vector2Angle(bullet_velocity) * RAD2DEG);
-			DrawEllipse(0, 0, 10, 3, COLOR_BULLET);
+			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
 		EndRotation();
 	}
 }
@@ -294,15 +296,20 @@ void load_map(const char* file_name) {
 		// O comprimento unitário é a menor largura de aresta de um tile que permite que o nível inteiro seja desenhado na tela
 		if (min_unit_length.y > min_unit_length.x) {
 			// O comprimento unitário se torna o menor entre os dois mínimos
-			unit_length = min_unit_length.x;
+			set_unit_length(min_unit_length.x);
 		} else {
-			unit_length = min_unit_length.y;
+			set_unit_length(min_unit_length.y);
 		}
 
 		// O offset serve para centralizar o jogo na tela, deixando bordas pretas quando necessário
 		level_offset.x = (GetScreenWidth()  - level_size.x * unit_length) / 2;
 		level_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
 	}
+}
+
+void set_unit_length(int length) {
+	unit_length = length;
+	bullet_size = (Vec2){ length * BULLET_DIAMETER/2, length * BULLET_LENGTH/2 };
 }
 
 // Verificar se a posição está dentro do nível
