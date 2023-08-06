@@ -23,14 +23,14 @@ void load_map(const char* file_name);
 char is_in_bounds(Vec2 position);
 char is_on_tile(Vec2 pos, Tile tile);
 int spawn_enemy(Vec2 position);
-void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context);
-void update_enemy(Enemy* enemy, void*);
-void is_enemy_at(Enemy* enemy, is_enemy_at_Args* args);
+void foreach_enemy(void (*callback)(PooledEnemy* enemy, void* context), void* context);
+void update_enemy(PooledEnemy* pooled_enemy, void*);
+void is_enemy_at(PooledEnemy* enemy, is_enemy_at_Args* args);
 void player_enemy_collision();
 void defrag_pool();
 char is_in_sight(Vec2 pos);
 void draw_tile(Vec2 position, Color color);
-void draw_enemy(Enemy* enemy, void*);
+void draw_enemy(PooledEnemy* enemy, void*);
 
 
 Vec2 level_size, level_offset;
@@ -348,27 +348,27 @@ int spawn_enemy(Vec2 position) {
 // Executar uma função para cada inimigo
 // `callback` é a função a ser chamada, e seu parâmetro `context`, que será enviada diretamente pelo parâmetro `context` da função abaixo,
 // é um ponteiro dinâmico (sem tipo) que serve como os argumentos adicionais (além do inimigo) que a função precise.
-void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context) {
+void foreach_enemy(void (*callback)(PooledEnemy* enemy, void* context), void* context) {
 	int i;
 
 	// Se houver `overflow` na pool, executa até o final da array e então começa do início até `upper_bound`
 	if (enemy_pool.lower_bound <= enemy_pool.upper_bound) {
 		for (i = enemy_pool.lower_bound; i <= enemy_pool.upper_bound; i++) {
 			if (enemy_pool.pool[i].active) {
-				(*callback)(&enemy_pool.pool[i].enemy, context);
+				(*callback)(&enemy_pool.pool[i], context);
 			}
 		}
 	}
 	else {
 		for (i = enemy_pool.lower_bound; i <= ENEMY_MAX - 1; i++) {
 			if (enemy_pool.pool[i].active) {
-				(*callback)(&enemy_pool.pool[i].enemy, context);
+				(*callback)(&enemy_pool.pool[i], context);
 			}
 		}
 
 		for (i = 0; i <= enemy_pool.upper_bound; i++) {
 			if (enemy_pool.pool[i].active) {
-				(*callback)(&enemy_pool.pool[i].enemy, context);
+				(*callback)(&enemy_pool.pool[i], context);
 			}
 		}
 	}
@@ -377,9 +377,14 @@ void foreach_enemy(void (*callback)(Enemy* enemy, void* context), void* context)
 // Atualizar o estado de um inimigo
 // Compatível com `foreach_enemy()`
 // O parâmetro `_` é ignorado
-void update_enemy(Enemy* enemy, void* _) {
+void update_enemy(PooledEnemy* pooled_enemy, void* _) {
+	Enemy* enemy = &pooled_enemy->enemy;
+	Rectangle enemy_hitbox;
+	Rectangle bullet_hitbox;
+
 	enemy->move_cooldown--;
 
+	
 	if (enemy->move_cooldown <= 0) {
 		Vec2 target_position;
 
@@ -448,8 +453,8 @@ void player_enemy_collision() {
 
 // Verificar se o inimigo está na posição
 // Compatível com `foreach_enemy()`
-void is_enemy_at(Enemy* enemy, is_enemy_at_Args* args) {
-	if (Vec2Equals(enemy->position, args->position)) {
+void is_enemy_at(PooledEnemy* enemy, is_enemy_at_Args* args) {
+	if (Vec2Equals(enemy->enemy.position, args->position)) {
 		args->is_any_enemy_at = 1;
 	}
 }
@@ -493,8 +498,8 @@ void draw_tile(Vec2 position, Color color) {
 // Desenhar um inimigo na tela
 // Compatível com `foreach_enemy()`
 // O parâmetro `_` é ignorado
-void draw_enemy(Enemy* enemy, void* _) {
-	if (is_in_sight(enemy->position)) {
-		draw_tile(enemy->position, COLOR_ENEMY);
+void draw_enemy(PooledEnemy* enemy, void* _) {
+	if (is_in_sight(enemy->enemy.position)) {
+		draw_tile(enemy->enemy.position, COLOR_ENEMY);
 	}
 }
