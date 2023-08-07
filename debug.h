@@ -7,12 +7,14 @@
 
 // Player
 #define DEBUG_INVINCIBILITY 1
-#define DEBUG_NIGHTVISION  1
+#define DEBUG_NIGHTVISION   1
+#define DEBUG_NOCLIP        1
 
 // Enemy
 #define DEBUG_ENEMY_CANTMOVE 0
 
 // Bullet
-#define DEBUG_BULLET_NOCOOLDOWN 1
+#define DEBUG_BULLET_NOCOOLDOWN  1
+#define DEBUG_BULLET_IGNOREWALLS 1
 
 #endif

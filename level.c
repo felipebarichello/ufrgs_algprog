@@ -155,7 +155,15 @@ void Level_Update() {
 
 	target_position = AddVec2(player_position, input_dir);
 
-	if (is_in_bounds(target_position) && !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)) {
+	// Desculpa pelo if esquisito, mas é a forma menos suja de enfiar a condicional de noclip
+	if (
+		is_in_bounds(target_position)
+		
+		#if (!DEBUG_NOCLIP)
+		&& !is_on_tile(target_position, T_WALL)
+		&& !is_on_tile(target_position, T_BURIED)
+		#endif
+	) {
 		is_enemy_at_Args args;
 
 		player_position = target_position;
@@ -473,9 +481,11 @@ void update_bullet() {
 		char* tile = &map[bullet_position_in_matrix.y][bullet_position_in_matrix.x];
 
 		switch (*tile) {
+			#if (!DEBUG_BULLET_IGNOREWALLS)
 			case T_WALL:
 				bullet_lifetime = 0;
 				break;
+			#endif
 
 			case T_BURIED:
 				bullet_lifetime = 0;
