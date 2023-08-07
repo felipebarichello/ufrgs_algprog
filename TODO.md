@@ -44,10 +44,10 @@
     [ ] Mínimo 30x20 (dimensões) cada um
     
 [ ] Game over
-    Casos
-        Win
-        Lose
-    Mostrar pontos
+    [ ] Casos
+        [ ] Win
+        [ ] Lose
+    [ ] Mostrar pontos
     
 [ ] Menu
     [ ] (N) Novo Jogo: Quando o usuário seleciona esta opção, um novo jogo é iniciado, a partir do
