@@ -159,7 +159,7 @@ void Level_Update() {
 	if (
 		is_in_bounds(target_position)
 		
-		#if (!DEBUG_NOCLIP)
+		#if (!DEBUG_PLAYER_NOCLIP)
 		&& !is_on_tile(target_position, T_WALL)
 		&& !is_on_tile(target_position, T_BURIED)
 		#endif
@@ -187,7 +187,7 @@ void Level_Update() {
 
 	// Jogador e inimigo
 	if (enemy_touches_player) {
-		#if (!DEBUG_INVINCIBILITY)
+		#if (!DEBUG_PLAYER_INVINCIBILITY)
 		player_enemy_collision();
 		#endif
 
@@ -535,7 +535,7 @@ void defrag_pool() {
 
 // Verificar se a posição é visível pelo jogador
 char is_in_sight(Vec2 pos) {
-	#if (DEBUG_NIGHTVISION)
+	#if (DEBUG_PLAYER_NIGHTVISION)
 	return 1;
 	#endif
 

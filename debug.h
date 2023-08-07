@@ -6,9 +6,9 @@
 /* --- Cheats --- */
 
 // Player
-#define DEBUG_INVINCIBILITY 1
-#define DEBUG_NIGHTVISION   1
-#define DEBUG_NOCLIP        1
+#define DEBUG_PLAYER_INVINCIBILITY 1
+#define DEBUG_PLAYER_NIGHTVISION   1
+#define DEBUG_PLAYER_NOCLIP        1
 
 // Enemy
 #define DEBUG_ENEMY_CANTMOVE 0
