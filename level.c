@@ -581,12 +581,16 @@ void defrag_pool() {
 
 // Verificar se a posição é visível pelo jogador
 char is_in_sight(Vec2 pos) {
+
 	#if (DEBUG_PLAYER_NIGHTVISION)
 	return 1;
 	#endif
 
-	int distance = Vec2Magnitude(SubVec2(pos, player_position));
-	return distance < sight_radius;
+	return Vec2Magnitude(SubVec2(pos, player_position)) < sight_radius // Verdadeiro se estiver dentro da visão do jogador
+		|| ( // Ou se estiver dentro da visão da bala
+			bullet_lifetime > 0 // Que exista
+			&& Vec2Magnitude(SubVec2(pos, Vec2FromVector2(screen2matrix(bullet_position)))) < BULLET_SIGHT_RADIUS
+		);
 }
 
 // Desenhar um quadrado em uma posição da matriz
