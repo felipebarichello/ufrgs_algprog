@@ -3,7 +3,7 @@
 [x] Fog of war (9x9) - 
 
 [ ] 3 vidas
-    [] Perder vida = reset inimigos vivos e jogador; apenas
+    [x] Perder vida = reset inimigos vivos e jogador; apenas
 
 [ ] Pontos
     Esmeralda - 100
@@ -11,8 +11,8 @@
     Touperia - 200
 
 [x] Tiro
-    Único
-    [ ] Abre área soterrada
+    [x] Único
+    [x] Abre área soterrada
 
 [ ] Coletáveis
     [ ] Ouro
@@ -47,7 +47,7 @@
     [ ] Casos
         [ ] Win
         [ ] Lose
-    [ ] Mostrar pontos
+    [x] Mostrar pontos
     
 [ ] Menu
     [ ] (N) Novo Jogo: Quando o usuário seleciona esta opção, um novo jogo é iniciado, a partir do
