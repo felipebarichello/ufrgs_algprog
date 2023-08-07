@@ -462,8 +462,29 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 
 // Atualizar o estado da bala
 void update_bullet() {
+	Vec2 bullet_position_in_matrix;
+
 	bullet_lifetime--;
 	bullet_position = AddVector2(bullet_position, bullet_velocity);
+
+	bullet_position_in_matrix = Vec2FromVector2(screen2matrix(bullet_position));
+
+	if (is_in_bounds(bullet_position_in_matrix)) {
+		char* tile = &map[bullet_position_in_matrix.y][bullet_position_in_matrix.x];
+
+		switch (*tile) {
+			case T_WALL:
+				bullet_lifetime = 0;
+				break;
+
+			case T_BURIED:
+				bullet_lifetime = 0;
+				*tile = T_EMPTY;
+				break;
+
+			// Note que a colisão com o inimigo é tratada em `update_enemy()`
+		}
+	}
 }
 
 // O que acontece quando o jogador toca um inimigo
