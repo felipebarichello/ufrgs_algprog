@@ -9,10 +9,10 @@
 #include "level_consts.h"
 #include "debug.h"
 
-#define millis2frames(millis) millis * FPS / 1000
-#define matrix_to_screen(pos, axis) pos.axis * unit_length + level_offset.axis
-#define matrix_to_screen_v(vec) AddVec2(ScaleVec2(vec, unit_length), level_offset)
 
+#define millis2frames(millis) millis * FPS / 1000
+#define matrix2screen(mpos) AddVec2(ScaleVec2(mpos, unit_length), level_offset)
+#define screen2matrix(spos) DivideVector2(SubVector2(spos, Vector2FromVec2(level_offset)), unit_length)
 
 typedef struct {
 	Vec2 position;
@@ -137,9 +137,9 @@ void Level_Update() {
 			/* Atirar */
 
 			Vec2 mouse_pos = { GetMouseX(), GetMouseY() };
-			Vec2 mouse_diff = SubVec2(mouse_pos, matrix_to_screen_v(player_position));
+			Vec2 mouse_diff = SubVec2(mouse_pos, matrix2screen(player_position));
 
-			bullet_position = Vector2FromVec2(AddVec2(matrix_to_screen_v(player_position), (Vec2){unit_length/2, unit_length/2}));
+			bullet_position = Vector2FromVec2(AddVec2(matrix2screen(player_position), (Vec2){unit_length/2, unit_length/2}));
 			bullet_velocity = ScaleVector2(NormalizeVector2(Vector2FromVec2(mouse_diff)), bullet_speed);
 			bullet_cooldown = millis2frames(SHOT_COOLDOWN);
 			bullet_lifetime = millis2frames(BULLET_LIFETIME);
@@ -386,6 +386,7 @@ void foreach_enemy(void (*callback)(PooledEnemy* enemy, void* context), void* co
 // O parâmetro `_` é ignorado
 void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 	Enemy* enemy = &pooled_enemy->enemy;
+	Vector2 enemy_on_screen;
 	Rectangle enemy_hitbox;
 	Rectangle bullet_hitbox;
 
@@ -449,7 +450,8 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 	}
 
 	/* Colidir com tiro */
-	enemy_hitbox = (Rectangle){ matrix_to_screen(enemy->position,x), matrix_to_screen(enemy->position,y), unit_length, unit_length };
+	enemy_on_screen = Vector2FromVec2(matrix2screen(enemy->position));
+	enemy_hitbox = (Rectangle){ enemy_on_screen.x, enemy_on_screen.y, unit_length, unit_length };
 	bullet_hitbox = (Rectangle){ bullet_position.x, bullet_position.y, bullet_size.x, bullet_size.x };
 
 	if (bullet_lifetime > 0 && CheckCollisionRecs(enemy_hitbox, bullet_hitbox)) {
@@ -512,8 +514,10 @@ char is_in_sight(Vec2 pos) {
 
 // Desenhar um quadrado em uma posição da matriz
 void draw_tile(Vec2 position, Color color) {
+	Vec2 position_on_screen = matrix2screen(position);
+
 	if (is_in_sight(position)) {
-		DrawRectangle(matrix_to_screen(position, x), matrix_to_screen(position, y), unit_length, unit_length, color);
+		DrawRectangle(position_on_screen.x, position_on_screen.y, unit_length, unit_length, color);
 	}
 }
 
