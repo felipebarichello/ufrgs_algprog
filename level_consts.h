@@ -7,6 +7,11 @@
 #define FPS 60
 
 
+/* --- Recursos --- */
+
+#define TOTAL_SOUNDS 11 // Total de sons
+
+
 /* --- Visual --- */
 
 // Tiles
@@ -38,6 +43,7 @@
 #define BULLET_SPEED      400  // Velocidade da bala
 #define BULLET_LENGTH     1.f  // Comprimento visual e da hitbox da bala
 #define BULLET_DIAMETER   .3f  // Diâmetro visual e da hitbox da bala
+#define COMBO_DURATION    8000 // Tempo até o combo resetar
 
 // Inimigo
 #define ENEMY_MAX 200                 // Máximo de inimigos na pool

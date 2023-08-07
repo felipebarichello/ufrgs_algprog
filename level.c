@@ -20,6 +20,7 @@ typedef struct {
 } is_enemy_at_Args;
 
 void load_map(const char* file_name);
+void load_sounds();
 void set_unit_length(int length);
 char is_in_bounds(Vec2 position);
 char is_on_tile(Vec2 pos, Tile tile);
@@ -67,14 +68,17 @@ Vec2 bullet_size;
 
 char enemy_touches_player;
 
+int combo;
+int combo_timer;
+
+Sound sounds[TOTAL_SOUNDS];
+
 
 // Chamada quando o jogo deve inicializar
 void Level_Init() {
 	int i, j;
 
 	SetTargetFPS(FPS);
-
-	/* Inicializações */
 
 	sight_radius = BASE_SIGHT_RADIUS;
 
@@ -83,6 +87,9 @@ void Level_Init() {
 	bullet_speed = BULLET_SPEED / FPS;
 
 	enemy_touches_player = 0;
+
+	combo = -1;
+	combo_timer = 0;
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
@@ -112,6 +119,8 @@ void Level_Init() {
 
 	// Armazenar a pool de inimigos inicial para reset posterior
 	memcpy(&initial_enemy_pool, &enemy_pool, sizeof(EnemyPool));
+
+	load_sounds();
 }
 
 // Chamada em cada frame antes de Draw()
@@ -128,6 +137,7 @@ void Level_Update() {
 	/* Tiro */
 
 	bullet_cooldown--;
+	combo_timer--;
 
 	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
 		#if (!DEBUG_BULLET_NOCOOLDOWN)
@@ -315,6 +325,20 @@ void load_map(const char* file_name) {
 	}
 }
 
+void load_sounds() {
+	sounds[0]  = LoadSound("resources/audio/firstblood.wav");
+	sounds[1]  = LoadSound("resources/audio/headshot.wav");
+	sounds[2]  = LoadSound("resources/audio/doublekill.wav");
+	sounds[3]  = LoadSound("resources/audio/triplekill.wav");
+	sounds[4]  = LoadSound("resources/audio/multikill.wav");
+	sounds[5]  = LoadSound("resources/audio/killingspree.wav");
+	sounds[6]  = LoadSound("resources/audio/rampage.wav");
+	sounds[7]  = LoadSound("resources/audio/dominating.wav");
+	sounds[8]  = LoadSound("resources/audio/ultrakill.wav");
+	sounds[9]  = LoadSound("resources/audio/godlike.wav");
+	sounds[10] = LoadSound("resources/audio/monsterkill.wav");
+}
+
 void set_unit_length(int length) {
 	unit_length = length;
 	bullet_size = (Vec2){ length * BULLET_DIAMETER/2, length * BULLET_LENGTH/2 };
@@ -465,6 +489,25 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 	if (bullet_lifetime > 0 && CheckCollisionRecs(enemy_hitbox, bullet_hitbox)) {
 		pooled_enemy->active = 0;
 		bullet_lifetime = 0;
+
+		if (combo == -1) {
+			combo = 1;
+			PlaySound(sounds[0]);
+		} else {
+			if (combo_timer > 0) {
+				combo++;
+			} else {
+				combo = 1;
+			}
+
+			if (combo < TOTAL_SOUNDS) {
+				PlaySound(sounds[combo]);
+			} else {
+				PlaySound(sounds[TOTAL_SOUNDS - 1]);
+			}
+		}
+
+		combo_timer = millis2frames(COMBO_DURATION);
 	}
 }
 
@@ -504,6 +547,9 @@ void player_enemy_collision() {
 
 	// Resetar o jogador
 	player_position = initial_player_position;
+
+	// Resetar o combo
+	combo = -1;
 }
 
 // Verificar se o inimigo está na posição

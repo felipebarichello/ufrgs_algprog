@@ -15,6 +15,7 @@ int main() {
 	srand(time(NULL));
 
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Pac-Mine");
+	InitAudioDevice();
 
 	// Menu_Init();
 	Level_Init(); // Implementado por game.c
@@ -27,6 +28,7 @@ int main() {
 		EndDrawing();
 	}
 
+	CloseAudioDevice();
 	CloseWindow();
 
 	return 0;
