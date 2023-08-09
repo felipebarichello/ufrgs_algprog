@@ -47,7 +47,7 @@
 #define COMBO_DURATION      8000 // Tempo até o combo resetar
 
 // Inimigo
-#define ENEMY_MAX 200                 // Máximo de inimigos na pool
+#define ENEMY_MAX 200                // Máximo de inimigos na pool
 #define MIN_ENEMY_MOVE_COOLDOWN 100  // Delay mínimo para o movimento do inimigo
 #define MAX_ENEMY_MOVE_COOLDOWN 150  // Delay máximo para o movimento do inimigo
 #define INITIAL_MOVE_COOLDOWN   1200 // Delay fixo inicial para o início do movimento do inimigo
