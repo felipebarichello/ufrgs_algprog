@@ -2,10 +2,10 @@
 	
 [x] Fog of war (9x9) - 
 
-[ ] 3 vidas
+[ ] 3 vidas //Guto
     [x] Perder vida = reset inimigos vivos e jogador; apenas
 
-[ ] Pontos
+[ ] Pontos //Guto
     Esmeralda - 100
     Ouro - 50
     Touperia - 200
@@ -14,23 +14,23 @@
     [x] Único
     [x] Abre área soterrada
 
-[ ] Coletáveis
+[ ] Coletáveis //Guto
     [ ] Ouro
         pontos
     [ ] Esmeralda
         Coletar todas implica fim da fase
     [ ] Power up
         *Visibilidade mapa inteiro (3s)
-        Escudo
+    [ ] Life Up - maybe
         etc.
         
-[ ] HUD
+[ ] HUD //Guto
     Vidas
     Pontuacao
     Nivel
     Esmeraldas_coletadas / Esmeraldas_totais
     
-[ ] Mapas
+[ ] Mapas //Guto
     [ ] Nome dinâmico
         mapa1.txt
         mapa2.txt
@@ -47,9 +47,9 @@
     [ ] Casos
         [ ] Win
         [ ] Lose
-    [x] Mostrar pontos
+    [ ] Mostrar pontos
     
-[ ] Menu
+[ ] Menu  //Lipe
     [ ] (N) Novo Jogo: Quando o usuário seleciona esta opção, um novo jogo é iniciado, a partir do
 primeiro nível. Todo progresso e número de vidas do jogador também é resetado.
     [ ] (C) Carregar jogo: Quando o usuário seleciona esta opção, um jogo previamente salvo deve ser
