@@ -43,6 +43,11 @@
         Mas deve ser dinâmico para qualquer numero de mapas
     [ ] Mínimo 30x20 (dimensões) cada um
     
+[ ] Tela inicial
+    [ ] Novo jogo
+    [ ] Carregar jogo
+    [ ] Sair
+
 [ ] Game over
     [ ] Casos
         [ ] Win
