@@ -99,7 +99,7 @@ void Level_Init() {
 	enemy_pool.lower_bound = 0;
 	enemy_pool.upper_bound = 0;
 
-	load_map("map.txt");
+	load_map("resources/maps/001.map");
 	
 	// Spawnar entidades baseado no mapa
 	for (i = 0; i < level_size.y; i++) {
