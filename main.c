@@ -1,35 +1,22 @@
 /*
-* Inicializa��o da janela e incorpora��o do programa
+* Inicialização da engine e tratamento pré-início e pós-término do jogo
 */
 
-
-#include <stdlib.h>
-#include <time.h>
-#include "gamelib.h"
+#include "start_engine.h"
 #include "level.h"
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
+
 int main() {
-	srand(time(NULL));
+	EngineBuilder builder;
 
-	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Pac-Mine");
-	InitAudioDevice();
+	builder.window_name = "Pac-Mine";
+	builder.window_size = (Vec2){ WINDOW_WIDTH, WINDOW_HEIGHT };
+	builder.initial_scene = Level_Scene();
 
-	// Menu_Init();
-	Level_Init(); // Implementado por game.c
-
-	while (!WindowShouldClose()) {
-		Level_Update(); // Implementado por game.c
-
-		BeginDrawing();
-			Level_Draw(); // Implementado por game.c
-		EndDrawing();
-	}
-
-	CloseAudioDevice();
-	CloseWindow();
+	StartEngine(&builder);
 
 	return 0;
 }

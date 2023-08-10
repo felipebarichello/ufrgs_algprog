@@ -150,12 +150,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="debug.h" />
+    <ClCompile Include="engine.c" />
     <ClCompile Include="gamelib.c" />
     <ClCompile Include="level_consts.h" />
     <ClCompile Include="main.c" />
     <ClCompile Include="level.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="scene.h" />
+    <ClInclude Include="start_engine.h" />
+    <ClInclude Include="engine.h" />
     <ClInclude Include="gamelib.h" />
     <ClInclude Include="level.h" />
     <ClInclude Include="level_lib.h" />

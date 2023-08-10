@@ -1,9 +1,7 @@
 /*
-* Cena: Jogo.
+* Cena: O nível do jogo.
 */
 
 #pragma once
 
-void Level_Init();
-void Level_Update();
-void Level_Draw();
+Scene Level_Scene();

@@ -1,14 +1,15 @@
-#include "level.h"
-
+#include "engine.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-#include "gamelib.h"
+
 #include "level_lib.h"
 #include "level_consts.h"
 #include "debug.h"
 
+#include "scene.h"
+scene(Level)
 
 #define millis2frames(millis) millis * FPS / 1000
 #define matrix2screen(mpos) AddVec2(ScaleVec2(mpos, unit_length), level_offset)

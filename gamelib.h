@@ -1,5 +1,5 @@
 /*
-* Extensão da raylib
+* Extensão da raylib. Contém definições que facilitam o desenvolvimento de jogos.
 */
 
 

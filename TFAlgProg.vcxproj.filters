@@ -9,39 +9,57 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source files\Scenes">
+    <Filter Include="Source files\Engine">
+      <UniqueIdentifier>{47e83170-47f1-4f40-a779-8923f837ac6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Game">
+      <UniqueIdentifier>{cbb3af74-2976-47e0-b394-aa7144f0173b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Game\Scenes">
       <UniqueIdentifier>{59219179-fd99-49c2-b77f-21f146eab226}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source files\Scenes\Level">
+    <Filter Include="Source files\Game\Scenes\Level">
       <UniqueIdentifier>{61a602ae-2162-44fd-a1ba-1b74d465ee04}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>Source files</Filter>
-    </ClCompile>
-    <ClCompile Include="gamelib.c">
-      <Filter>Source files</Filter>
-    </ClCompile>
     <ClCompile Include="level.c">
-      <Filter>Source files\Scenes\Level</Filter>
+      <Filter>Source files\Game\Scenes\Level</Filter>
     </ClCompile>
     <ClCompile Include="level_consts.h">
-      <Filter>Source files\Scenes\Level</Filter>
+      <Filter>Source files\Game\Scenes\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="engine.c">
+      <Filter>Source files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="gamelib.c">
+      <Filter>Source files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="debug.h">
-      <Filter>Source files</Filter>
+      <Filter>Source files\Game</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
+      <Filter>Source files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="level.h">
-      <Filter>Source files\Scenes\Level</Filter>
+      <Filter>Source files\Game\Scenes\Level</Filter>
     </ClInclude>
     <ClInclude Include="level_lib.h">
-      <Filter>Source files\Scenes\Level</Filter>
+      <Filter>Source files\Game\Scenes\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="start_engine.h">
+      <Filter>Source files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine.h">
+      <Filter>Source files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>Source files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="gamelib.h">
-      <Filter>Source files</Filter>
+      <Filter>Source files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
