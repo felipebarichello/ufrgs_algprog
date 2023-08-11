@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "level_lib.h"
-#include "level_consts.h"
 #include "debug.h"
 
 #include "scene.h"
@@ -72,7 +71,7 @@ char enemy_touches_player;
 int combo;
 int combo_timer;
 
-Sound sounds[COMBO_SOUNDS + 3];
+LevelSounds sounds;
 
 
 // Chamada quando o jogo deve inicializar
@@ -155,11 +154,11 @@ void Level_Update() {
 			bullet_cooldown = millis2frames(SHOT_COOLDOWN);
 			bullet_lifetime = millis2frames(BULLET_LIFETIME);
 
-			PlaySound(sounds[11]);
+			PlaySound(sounds.gunshot);
 		}
 		#if (!DEBUG_BULLET_NOCOOLDOWN)
 		else {
-			PlaySound(sounds[12]);
+			PlaySound(sounds.empty_gun);
 		}
 		#endif
 	}
@@ -334,20 +333,20 @@ void load_map(const char* file_name) {
 }
 
 void load_sounds() {
-	sounds[0]  = LoadSound("resources/audio/firstblood.wav");
-	sounds[1]  = LoadSound("resources/audio/headshot.wav");
-	sounds[2]  = LoadSound("resources/audio/doublekill.wav");
-	sounds[3]  = LoadSound("resources/audio/triplekill.wav");
-	sounds[4]  = LoadSound("resources/audio/multikill.wav");
-	sounds[5]  = LoadSound("resources/audio/killingspree.wav");
-	sounds[6]  = LoadSound("resources/audio/rampage.wav");
-	sounds[7]  = LoadSound("resources/audio/dominating.wav");
-	sounds[8]  = LoadSound("resources/audio/ultrakill.wav");
-	sounds[9]  = LoadSound("resources/audio/godlike.wav");
-	sounds[10] = LoadSound("resources/audio/monsterkill.wav");
-	sounds[11] = LoadSound("resources/audio/gunshot.mp3");
-	sounds[12] = LoadSound("resources/audio/emptygun.wav");
-	sounds[13] = LoadSound("resources/audio/splat.mp3");
+	sounds.combo[0]  = LoadSound("resources/audio/firstblood.wav");
+	sounds.combo[1]  = LoadSound("resources/audio/headshot.wav");
+	sounds.combo[2]  = LoadSound("resources/audio/doublekill.wav");
+	sounds.combo[3]  = LoadSound("resources/audio/triplekill.wav");
+	sounds.combo[4]  = LoadSound("resources/audio/multikill.wav");
+	sounds.combo[5]  = LoadSound("resources/audio/killingspree.wav");
+	sounds.combo[6]  = LoadSound("resources/audio/rampage.wav");
+	sounds.combo[7]  = LoadSound("resources/audio/dominating.wav");
+	sounds.combo[8]  = LoadSound("resources/audio/ultrakill.wav");
+	sounds.combo[9]  = LoadSound("resources/audio/godlike.wav");
+	sounds.combo[10] = LoadSound("resources/audio/monsterkill.wav");
+	sounds.gunshot   = LoadSound("resources/audio/gunshot.mp3");
+	sounds.empty_gun = LoadSound("resources/audio/emptygun.wav");
+	sounds.kill      = LoadSound("resources/audio/splat.mp3");
 }
 
 void set_unit_length(int length) {
@@ -501,11 +500,11 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 		pooled_enemy->active = 0;
 		bullet_lifetime = 0;
 
-		PlaySound(sounds[13]);
+		PlaySound(sounds.kill);
 
 		if (combo == -1) {
 			combo = 1;
-			PlaySound(sounds[0]);
+			PlaySound(sounds.combo[0]);
 		} else {
 			if (combo_timer > 0) {
 				combo++;
@@ -514,9 +513,9 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 			}
 
 			if (combo < COMBO_SOUNDS) {
-				PlaySound(sounds[combo]);
+				PlaySound(sounds.combo[combo]);
 			} else {
-				PlaySound(sounds[COMBO_SOUNDS - 1]);
+				PlaySound(sounds.combo[COMBO_SOUNDS - 1]);
 			}
 		}
 

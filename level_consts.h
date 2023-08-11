@@ -9,7 +9,7 @@
 
 /* --- Recursos --- */
 
-#define COMBO_SOUNDS 11 // Total de sons
+#define COMBO_SOUNDS 11 // Total de sons de combo
 
 
 /* --- Visual --- */

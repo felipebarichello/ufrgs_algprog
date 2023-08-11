@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gamelib.h"
+#include "level_consts.h"
 
 typedef struct {
 	// Posição do inimigo da matriz
@@ -18,6 +19,16 @@ typedef struct {
 	Enemy enemy;
 	char active; // Booleana para o estado do inimigo
 } PooledEnemy;
+
+typedef struct {
+	// "Double kill", "triple kill", etc.
+	// "First blood" é considerado um som de combo
+	Sound combo[COMBO_SOUNDS];
+
+	Sound gunshot;   // Som do tiro
+	Sound empty_gun; // Som do tiro quando está em cooldown
+	Sound kill;     // Som de morte do inimigo
+} LevelSounds;
 
 typedef enum {
 	T_EMPTY    = 0,   // Ausência de tile. Todos os outros códigos inválidos também são considerados vazios.
