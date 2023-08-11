@@ -64,3 +64,9 @@ typedef struct {
 	int lower_bound;
 	int upper_bound;
 } EnemyPool;
+
+typedef struct {
+	int lifetime;
+	Vector2 position;
+	Vector2 velocity;
+} Bullet;

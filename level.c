@@ -44,12 +44,11 @@ EnemyPool initial_enemy_pool;
 Vec2 initial_player_position;
 Vec2 player_position;
 
-int bullet_lifetime;
-Vector2 bullet_position;
-Vector2 bullet_velocity;
-int bullet_cooldown;
+int shot_cooldown;
 float bullet_speed;
 Vec2 bullet_size;
+
+Bullet bullet;
 
 char enemy_touches_player;
 
@@ -67,8 +66,8 @@ void Level_Init() {
 
 	sight_radius = BASE_SIGHT_RADIUS;
 
-	bullet_lifetime = 0;
-	bullet_cooldown = 0;
+	bullet.lifetime = 0;
+	shot_cooldown = 0;
 	bullet_speed = BULLET_SPEED / FPS;
 
 	enemy_touches_player = 0;
@@ -120,12 +119,12 @@ void Level_Update() {
 
 	/* Tiro */
 
-	bullet_cooldown--;
+	shot_cooldown--;
 	combo_timer--;
 
 	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
 		#if (!DEBUG_BULLET_NOCOOLDOWN)
-		if (bullet_cooldown <= 0)
+		if (shot_cooldown <= 0)
         #endif
 		{
 			/* Atirar */
@@ -133,10 +132,10 @@ void Level_Update() {
 			Vec2 mouse_pos = { GetMouseX(), GetMouseY() };
 			Vec2 mouse_diff = SubVec2(mouse_pos, matrix2screen(player_position));
 
-			bullet_position = Vector2FromVec2(AddVec2(matrix2screen(player_position), (Vec2) { unit_length / 2, unit_length / 2 }));
-			bullet_velocity = ScaleVector2(NormalizeVector2(Vector2FromVec2(mouse_diff)), bullet_speed);
-			bullet_cooldown = millis2frames(SHOT_COOLDOWN);
-			bullet_lifetime = millis2frames(BULLET_LIFETIME);
+			bullet.position = Vector2FromVec2(AddVec2(matrix2screen(player_position), (Vec2) { unit_length / 2, unit_length / 2 }));
+			bullet.velocity = ScaleVector2(NormalizeVector2(Vector2FromVec2(mouse_diff)), bullet_speed);
+			shot_cooldown = millis2frames(SHOT_COOLDOWN);
+			bullet.lifetime = millis2frames(BULLET_LIFETIME);
 
 			PlaySound(sounds.gunshot);
 		}
@@ -148,7 +147,7 @@ void Level_Update() {
 	}
 
 	// Se a bala estiver ativa, atualizar seu estado
-	if (bullet_lifetime > 0) {
+	if (bullet.lifetime > 0) {
 		update_bullet();
 	}
 
@@ -247,8 +246,8 @@ void Level_Draw() {
 	draw_tile(player_position, COLOR_PLAYER);
 
 	// Desenhar tiro (se estiver ativo)
-	if (bullet_lifetime > 0) {
-		BeginRotation(bullet_position, Vector2Angle(bullet_velocity) * RAD2DEG);
+	if (bullet.lifetime > 0) {
+		BeginRotation(bullet.position, Vector2Angle(bullet.velocity) * RAD2DEG);
 			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
 		EndRotation();
 	}
@@ -478,11 +477,11 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 	/* Colidir com tiro */
 	enemy_on_screen = Vector2FromVec2(matrix2screen(enemy->position));
 	enemy_hitbox = (Rectangle){ enemy_on_screen.x, enemy_on_screen.y, unit_length, unit_length };
-	bullet_hitbox = (Rectangle){ bullet_position.x, bullet_position.y, bullet_size.x, bullet_size.x };
+	bullet_hitbox = (Rectangle){ bullet.position.x, bullet.position.y, bullet_size.x, bullet_size.x };
 
-	if (bullet_lifetime > 0 && CheckCollisionRecs(enemy_hitbox, bullet_hitbox)) {
+	if (bullet.lifetime > 0 && CheckCollisionRecs(enemy_hitbox, bullet_hitbox)) {
 		pooled_enemy->active = 0;
-		bullet_lifetime = 0;
+		bullet.lifetime = 0;
 
 		PlaySound(sounds.kill);
 
@@ -511,10 +510,10 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 void update_bullet() {
 	Vec2 bullet_position_in_matrix;
 
-	bullet_lifetime--;
-	bullet_position = AddVector2(bullet_position, bullet_velocity);
+	bullet.lifetime--;
+	bullet.position = AddVector2(bullet.position, bullet.velocity);
 
-	bullet_position_in_matrix = Vec2FromVector2(screen2matrix(bullet_position));
+	bullet_position_in_matrix = Vec2FromVector2(screen2matrix(bullet.position));
 
 	if (is_in_bounds(bullet_position_in_matrix)) {
 		char* tile = &map[bullet_position_in_matrix.y][bullet_position_in_matrix.x];
@@ -522,12 +521,12 @@ void update_bullet() {
 		switch (*tile) {
 			#if (!DEBUG_BULLET_IGNOREWALLS)
 			case T_WALL:
-				bullet_lifetime = 0;
+				bullet.lifetime = 0;
 				break;
 			#endif
 
 			case T_BURIED:
-				bullet_lifetime = 0;
+				bullet.lifetime = 0;
 				*tile = T_EMPTY;
 				break;
 
@@ -548,8 +547,8 @@ void player_enemy_collision() {
 	combo = -1;
 
 	// Resetar a bala
-	bullet_lifetime = 0;
-	bullet_cooldown = 0;
+	bullet.lifetime = 0;
+	shot_cooldown = 0;
 }
 
 // Verificar se o inimigo está na posição
@@ -588,8 +587,8 @@ char is_in_sight(Vec2 pos) {
 
 	return Vec2Magnitude(SubVec2(pos, player_position)) < sight_radius // Verdadeiro se estiver dentro da visão do jogador
 		|| ( // Ou se estiver dentro da visão da bala
-			bullet_lifetime > 0 // Que exista
-			&& Vec2Magnitude(SubVec2(pos, Vec2FromVector2(screen2matrix(bullet_position)))) < BULLET_SIGHT_RADIUS
+			bullet.lifetime > 0 // Que exista
+			&& Vec2Magnitude(SubVec2(pos, Vec2FromVector2(screen2matrix(bullet.position)))) < BULLET_SIGHT_RADIUS
 		);
 }
 
