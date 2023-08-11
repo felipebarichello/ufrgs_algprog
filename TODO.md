@@ -75,4 +75,4 @@ para o jogo, que continua do ponto em que parou quando o usuário acessou o m
 
 # Problemas
 
-[ ] Bala deve ser apagada quando o jogador toma dano
+[x] Bala deve ser apagada quando o jogador toma dano
