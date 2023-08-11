@@ -72,7 +72,7 @@ char enemy_touches_player;
 int combo;
 int combo_timer;
 
-Sound sounds[TOTAL_SOUNDS];
+Sound sounds[COMBO_SOUNDS + 3];
 
 
 // Chamada quando o jogo deve inicializar
@@ -143,18 +143,25 @@ void Level_Update() {
 	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
 		#if (!DEBUG_BULLET_NOCOOLDOWN)
 		if (bullet_cooldown <= 0)
-		#endif
+        #endif
 		{
 			/* Atirar */
 
 			Vec2 mouse_pos = { GetMouseX(), GetMouseY() };
 			Vec2 mouse_diff = SubVec2(mouse_pos, matrix2screen(player_position));
 
-			bullet_position = Vector2FromVec2(AddVec2(matrix2screen(player_position), (Vec2){unit_length/2, unit_length/2}));
+			bullet_position = Vector2FromVec2(AddVec2(matrix2screen(player_position), (Vec2) { unit_length / 2, unit_length / 2 }));
 			bullet_velocity = ScaleVector2(NormalizeVector2(Vector2FromVec2(mouse_diff)), bullet_speed);
 			bullet_cooldown = millis2frames(SHOT_COOLDOWN);
 			bullet_lifetime = millis2frames(BULLET_LIFETIME);
+
+			PlaySound(sounds[11]);
 		}
+		#if (!DEBUG_BULLET_NOCOOLDOWN)
+		else {
+			PlaySound(sounds[12]);
+		}
+		#endif
 	}
 
 	// Se a bala estiver ativa, atualizar seu estado
@@ -338,6 +345,9 @@ void load_sounds() {
 	sounds[8]  = LoadSound("resources/audio/ultrakill.wav");
 	sounds[9]  = LoadSound("resources/audio/godlike.wav");
 	sounds[10] = LoadSound("resources/audio/monsterkill.wav");
+	sounds[11] = LoadSound("resources/audio/gunshot.mp3");
+	sounds[12] = LoadSound("resources/audio/emptygun.wav");
+	sounds[13] = LoadSound("resources/audio/splat.mp3");
 }
 
 void set_unit_length(int length) {
@@ -491,6 +501,8 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 		pooled_enemy->active = 0;
 		bullet_lifetime = 0;
 
+		PlaySound(sounds[13]);
+
 		if (combo == -1) {
 			combo = 1;
 			PlaySound(sounds[0]);
@@ -501,10 +513,10 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 				combo = 1;
 			}
 
-			if (combo < TOTAL_SOUNDS) {
+			if (combo < COMBO_SOUNDS) {
 				PlaySound(sounds[combo]);
 			} else {
-				PlaySound(sounds[TOTAL_SOUNDS - 1]);
+				PlaySound(sounds[COMBO_SOUNDS - 1]);
 			}
 		}
 
