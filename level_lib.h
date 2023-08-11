@@ -9,6 +9,23 @@
 #define screen2matrix(spos) DivideVector2(SubVector2(spos, Vector2FromVec2(level_offset)), unit_length)
 
 
+typedef enum {
+	T_EMPTY    = 0,   // Ausência de tile. Todos os outros códigos inválidos também são considerados vazios.
+
+	// Entidades
+	T_PLAYER  = 'J', // O Jogador
+	T_ENEMY   = 'T', // Cada inimigo
+
+	// Sólidos
+	T_WALL    = '#', // Paredes
+	T_BURIED  = 'S', // Áreas soterradas
+	
+	// Consumíveis
+	T_EMERALD = 'E', // Esmeralda
+	T_GOLD    = 'O', // Ouro
+	T_POWERUP = 'A', // Power-up
+} Tile;
+
 typedef struct {
 	// "Double kill", "triple kill", etc.
 	// "First blood" é considerado um som de combo
@@ -47,20 +64,3 @@ typedef struct {
 	int lower_bound;
 	int upper_bound;
 } EnemyPool;
-
-typedef enum {
-	T_EMPTY    = 0,   // Ausência de tile. Todos os outros códigos inválidos também são considerados vazios.
-
-	// Entidades
-	T_PLAYER  = 'J', // O Jogador
-	T_ENEMY   = 'T', // Cada inimigo
-
-	// Sólidos
-	T_WALL    = '#', // Paredes
-	T_BURIED  = 'S', // Áreas soterradas
-	
-	// Consumíveis
-	T_EMERALD = 'E', // Esmeralda
-	T_GOLD    = 'O', // Ouro
-	T_POWERUP = 'A', // Power-up
-} Tile;
