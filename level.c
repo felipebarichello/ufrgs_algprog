@@ -18,6 +18,7 @@ typedef struct {
 
 void load_map(const char* file_name);
 void load_sounds();
+void soft_reset();
 void set_unit_length(int length);
 char is_in_bounds(Vec2 position);
 char is_on_tile(Vec2 pos, Tile tile);
@@ -63,25 +64,22 @@ void Level_Init() {
 	int i, j;
 
 	SetTargetFPS(FPS);
+	
+	load_sounds();
 
 	sight_radius = BASE_SIGHT_RADIUS;
-
-	bullet.lifetime = 0;
-	shot_cooldown = 0;
 	bullet_speed = BULLET_SPEED / FPS;
+	
+	load_map("resources/maps/001.map");
 
 	enemy_touches_player = 0;
 
-	combo = -1;
-
 	for (i = 0; i < ENEMY_MAX; i++) {
-		enemy_pool.pool[i].active = 0;
+		initial_enemy_pool.pool[i].active = 0;
 	}
 
-	enemy_pool.lower_bound = 0;
-	enemy_pool.upper_bound = 0;
-
-	load_map("resources/maps/001.map");
+	initial_enemy_pool.lower_bound = 0;
+	initial_enemy_pool.upper_bound = 0;
 	
 	// Spawnar entidades baseado no mapa
 	for (i = 0; i < level_size.y; i++) {
@@ -94,16 +92,13 @@ void Level_Init() {
 					break;
 
 				case T_ENEMY:
-					spawn_enemy(matrix_position);
+					spawn_enemy(matrix_position, &initial_enemy_pool);
 					break;
 			}
 		}
 	}
 
-	// Armazenar a pool de inimigos inicial para reset posterior
-	memcpy(&initial_enemy_pool, &enemy_pool, sizeof(EnemyPool));
-
-	load_sounds();
+	soft_reset();
 }
 
 // Chamada em cada frame antes de Draw()
@@ -332,6 +327,22 @@ void load_sounds() {
 	sounds.kill      = LoadSound("resources/audio/splat.mp3");
 }
 
+// Reseta parcialmente o nível
+void soft_reset() {
+	// Resetar o jogador
+	player_position = initial_player_position;
+
+	// Resetar os inimigos
+	memcpy(&enemy_pool, &initial_enemy_pool, sizeof(EnemyPool));
+
+	// Resetar a bala
+	bullet.lifetime = 0;
+	shot_cooldown = 0;
+
+	// Resetar o combo
+	combo = -1;
+}
+
 void set_unit_length(int length) {
 	unit_length = length;
 	bullet_size = (Vec2){ length * BULLET_DIAMETER/2, length * BULLET_LENGTH/2 };
@@ -348,29 +359,29 @@ char is_on_tile(Vec2 pos, Tile tile) {
 }
 
 // Inicializar uma instância de inimigo em uma posição e atualizar a pool
-void spawn_enemy(Vec2 position) {
+void spawn_enemy(Vec2 position, EnemyPool* pool) {
 	PooledEnemy* enemy;
 
 	// Aqui, `upper_bound` pode se tornar igual a `lower_bound` ou sair para fora da array
-	enemy_pool.upper_bound++;
+	pool->upper_bound++;
 
 	// Caso saia para fora da array
-	if (enemy_pool.upper_bound == ENEMY_MAX) {
-		enemy_pool.upper_bound = 0;
+	if (pool->upper_bound == ENEMY_MAX) {
+		pool->upper_bound = 0;
 	}
 
 	// Caso se torne igual a `lower_bound`, defragmentar pool ou sobrescrever antigo incrementar `lower_bound`
-	if (enemy_pool.upper_bound == enemy_pool.lower_bound) {
+	if (pool->upper_bound == pool->lower_bound) {
 		defrag_pool();
 
-		if (enemy_pool.lower_bound == ENEMY_MAX - 1) {
-			enemy_pool.lower_bound = 0;
+		if (pool->lower_bound == ENEMY_MAX - 1) {
+			pool->lower_bound = 0;
 		} else {
-			enemy_pool.lower_bound++;
+			pool->lower_bound++;
 		}
 	}
 
-	enemy = &enemy_pool.pool[enemy_pool.upper_bound];
+	enemy = &pool->pool[pool->upper_bound];
 	enemy->enemy.position = position;
 	enemy->enemy.direction = (Vec2){0, 0};
 	enemy->enemy.move_cooldown = millis2frames(INITIAL_MOVE_COOLDOWN);
@@ -537,18 +548,7 @@ void update_bullet() {
 
 // O que acontece quando o jogador toca um inimigo
 void player_enemy_collision() {
-	// Resetar os inimigos
-	memcpy(&enemy_pool, &initial_enemy_pool, sizeof(EnemyPool));
-
-	// Resetar o jogador
-	player_position = initial_player_position;
-
-	// Resetar o combo
-	combo = -1;
-
-	// Resetar a bala
-	bullet.lifetime = 0;
-	shot_cooldown = 0;
+	soft_reset();
 }
 
 // Verificar se o inimigo está na posição
