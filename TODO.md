@@ -1,3 +1,5 @@
+# Features
+
 [x] Toupeira pode se mover por áreas soterradas
 	
 [x] Fog of war (9x9) - 
@@ -68,3 +70,9 @@ jogar.
     [ ] (Q) Sair do jogo: Quando o usuário seleciona esta opção, o jogo é finalizado, sem salvar.
     [ ] (V) Voltar: Quando o usuário seleciona esta opção, deve-se abandonar o menu e o controle volta
 para o jogo, que continua do ponto em que parou quando o usuário acessou o menu.
+
+---
+
+# Problemas
+
+[ ] Bala deve ser apagada quando o jogador toma dano
