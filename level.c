@@ -21,7 +21,7 @@ void load_sounds();
 void set_unit_length(int length);
 char is_in_bounds(Vec2 position);
 char is_on_tile(Vec2 pos, Tile tile);
-int spawn_enemy(Vec2 position);
+void spawn_enemy(Vec2 position);
 void foreach_enemy(void (*callback)(PooledEnemy* enemy, void* context), void* context);
 void update_enemy(PooledEnemy* pooled_enemy, void*);
 void update_bullet();
@@ -348,7 +348,7 @@ char is_on_tile(Vec2 pos, Tile tile) {
 }
 
 // Inicializar uma instância de inimigo em uma posição e atualizar a pool
-int spawn_enemy(Vec2 position) {
+void spawn_enemy(Vec2 position) {
 	PooledEnemy* enemy;
 
 	// Aqui, `upper_bound` pode se tornar igual a `lower_bound` ou sair para fora da array
