@@ -9,7 +9,7 @@
 #include "gamelib.h"
 
 
-typedef struct {
+typedef struct Scene {
 	void (*init)();
 	void (*update)();
 	void (*draw)();

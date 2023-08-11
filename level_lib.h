@@ -9,7 +9,7 @@
 #define screen2matrix(spos) DivideVector2(SubVector2(spos, Vector2FromVec2(level_offset)), unit_length)
 
 
-typedef enum {
+typedef enum Tile {
 	T_EMPTY    = 0,   // Ausência de tile. Todos os outros códigos inválidos também são considerados vazios.
 
 	// Entidades
@@ -26,7 +26,7 @@ typedef enum {
 	T_POWERUP = 'A', // Power-up
 } Tile;
 
-typedef struct {
+typedef struct LevelSounds {
 	// "Double kill", "triple kill", etc.
 	// "First blood" é considerado um som de combo
 	Sound combo[COMBO_SOUNDS];
@@ -36,7 +36,7 @@ typedef struct {
 	Sound kill;     // Som de morte do inimigo
 } LevelSounds;
 
-typedef struct {
+typedef struct Enemy {
 	// Posição do inimigo da matriz
 	Vec2 position;
 
@@ -48,14 +48,14 @@ typedef struct {
 	int move_cooldown;
 } Enemy;
 
-typedef struct {
+typedef struct PooledEnemy {
 	Enemy enemy;
 	char active; // Booleana para o estado do inimigo
 } PooledEnemy;
 
 // Object pooling é uma técnica de armazenar os objetos em uma array finita já desde o começo,
 // reaproveitando os objetos já destruídos ou ainda não criados
-typedef struct {
+typedef struct EnemyPool {
 	// A pool de fato
 	PooledEnemy pool[ENEMY_MAX];
 
@@ -65,7 +65,7 @@ typedef struct {
 	int upper_bound;
 } EnemyPool;
 
-typedef struct {
+typedef struct Bullet {
 	int lifetime;
 	Vector2 position;
 	Vector2 velocity;

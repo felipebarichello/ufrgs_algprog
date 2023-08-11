@@ -11,7 +11,7 @@
 // Raíz quadrada de 2
 #define SQRT_2 1.41421356237
 
-typedef struct {
+typedef struct Vec2 {
 	int x, y;
 } Vec2;
 
