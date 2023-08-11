@@ -3,6 +3,12 @@
 #include "gamelib.h"
 #include "level_consts.h"
 
+
+#define millis2frames(millis) millis * FPS / 1000
+#define matrix2screen(mpos) AddVec2(ScaleVec2(mpos, unit_length), level_offset)
+#define screen2matrix(spos) DivideVector2(SubVector2(spos, Vector2FromVec2(level_offset)), unit_length)
+
+
 typedef struct {
 	// Posição do inimigo da matriz
 	Vec2 position;
