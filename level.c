@@ -89,7 +89,6 @@ void Level_Init() {
 	enemy_touches_player = 0;
 
 	combo = -1;
-	combo_timer = 0;
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		enemy_pool.pool[i].active = 0;
@@ -562,6 +561,10 @@ void player_enemy_collision() {
 
 	// Resetar o combo
 	combo = -1;
+
+	// Resetar a bala
+	bullet_lifetime = 0;
+	bullet_cooldown = 0;
 }
 
 // Verificar se o inimigo está na posição
