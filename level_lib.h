@@ -10,6 +10,16 @@
 
 
 typedef struct {
+	// "Double kill", "triple kill", etc.
+	// "First blood" é considerado um som de combo
+	Sound combo[COMBO_SOUNDS];
+
+	Sound gunshot;   // Som do tiro
+	Sound empty_gun; // Som do tiro quando está em cooldown
+	Sound kill;     // Som de morte do inimigo
+} LevelSounds;
+
+typedef struct {
 	// Posição do inimigo da matriz
 	Vec2 position;
 
@@ -26,15 +36,17 @@ typedef struct {
 	char active; // Booleana para o estado do inimigo
 } PooledEnemy;
 
+// Object pooling é uma técnica de armazenar os objetos em uma array finita já desde o começo,
+// reaproveitando os objetos já destruídos ou ainda não criados
 typedef struct {
-	// "Double kill", "triple kill", etc.
-	// "First blood" é considerado um som de combo
-	Sound combo[COMBO_SOUNDS];
+	// A pool de fato
+	PooledEnemy pool[ENEMY_MAX];
 
-	Sound gunshot;   // Som do tiro
-	Sound empty_gun; // Som do tiro quando está em cooldown
-	Sound kill;     // Som de morte do inimigo
-} LevelSounds;
+	// Os bounds são para questões de performance.
+	// Atualizando-os, não precisaremos avaliar todos os inimigos para verificar seus estados
+	int lower_bound;
+	int upper_bound;
+} EnemyPool;
 
 typedef enum {
 	T_EMPTY    = 0,   // Ausência de tile. Todos os outros códigos inválidos também são considerados vazios.

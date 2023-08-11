@@ -38,18 +38,6 @@ int unit_length, sight_radius;
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 
-// Object pooling é uma técnica de armazenar os objetos em uma array finita já desde o começo,
-// reaproveitando os objetos já destruídos ou ainda não criados
-typedef struct {
-	// A pool de fato
-	PooledEnemy pool[ENEMY_MAX];
-
-	// Os bounds são para questões de performance.
-	// Atualizando-os, não precisaremos avaliar todos os inimigos para verificar seus estados
-	int lower_bound;
-	int upper_bound;
-} EnemyPool;
-
 EnemyPool enemy_pool;
 EnemyPool initial_enemy_pool;
 
