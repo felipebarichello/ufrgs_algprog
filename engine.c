@@ -12,9 +12,7 @@ void StartEngine(EngineBuilder* builder) {
 	InitWindow(builder->window_size.x, builder->window_size.y, builder->window_name);
 	InitAudioDevice();
 
-	cur_scene = builder->initial_scene;
-
-	cur_scene.init();
+	SetScene(builder->initial_scene);
 
 	while (!WindowShouldClose()) {
 		cur_scene.update();
@@ -26,4 +24,9 @@ void StartEngine(EngineBuilder* builder) {
 
 	CloseAudioDevice();
 	CloseWindow();
+}
+
+void SetScene(Scene scene) {
+	cur_scene = scene;
+	scene.init();
 }

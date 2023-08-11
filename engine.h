@@ -14,3 +14,7 @@ typedef struct {
 	void (*update)();
 	void (*draw)();
 } Scene;
+
+
+// Troca a cena atual
+void SetScene(Scene scene);
