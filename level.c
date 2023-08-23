@@ -32,20 +32,26 @@ void defrag_pool();
 char is_in_sight(Vec2 pos);
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(PooledEnemy* enemy, void*);
-void check_collectable(int* sight_radius, int* score, int* level_completion);
+void check_collectable();
+void print_emeralds(Vec2 caixa);
+void print_score(Vec2 caixa);
+void print_lives(Vec2 caixa);
+void make_name(char map_name[], int next_level);
 
 
 Vec2 level_size, level_offset;
 int unit_length, sight_radius, level_completion;
+char map_name[256]; //Será que é uma boa deixar isso como var. global? Se sim, melhor tirar o map_name dos parâmetros de make_name()
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
+int level_max_emeralds;
 
 EnemyPool enemy_pool;
 EnemyPool initial_enemy_pool;
 
 Vec2 initial_player_position;
 Vec2 player_position;
-int score;
+int score = 0, lives = 3;
 
 int shot_cooldown;
 float bullet_speed;
@@ -72,8 +78,8 @@ void Level_Init() {
 	sight_radius = BASE_SIGHT_RADIUS;
 	bullet_speed = BULLET_SPEED / FPS;
 
-	score = 0;
 	level_completion = 0;
+	level_max_emeralds = 0;
 	
 	load_map("resources/maps/001.map");
 
@@ -86,7 +92,7 @@ void Level_Init() {
 	initial_enemy_pool.lower_bound = 0;
 	initial_enemy_pool.upper_bound = 0;
 	
-	// Spawnar entidades baseado no mapa
+	// Spawnar entidades e contar esmeraldas baseado no mapa
 	for (i = 0; i < level_size.y; i++) {
 		for (j = 0; j < level_size.x; j++) {
 			Vec2 matrix_position = {j, i};
@@ -99,6 +105,10 @@ void Level_Init() {
 				case T_ENEMY:
 					spawn_enemy(matrix_position, &initial_enemy_pool);
 					break;
+
+				case T_EMERALD:
+					level_max_emeralds++;
+					break;
 			}
 		}
 	}
@@ -107,25 +117,31 @@ void Level_Init() {
 }
 
 // Chamada em cada frame antes de Draw()
-void Level_Update() {
+void Level_Update()
+{
 	Vec2 input_dir = { 0, 0 }, target_position;
 
 	/* Input de movimento */
 
-	if (IsKeyPressed(KEY_UP)    || IsKeyPressed(KEY_W)) input_dir.y--;
-	if (IsKeyPressed(KEY_DOWN)  || IsKeyPressed(KEY_S)) input_dir.y++;
-	if (IsKeyPressed(KEY_LEFT)  || IsKeyPressed(KEY_A)) input_dir.x--;
-	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) input_dir.x++;
+	if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
+		input_dir.y--;
+	if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S))
+		input_dir.y++;
+	if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A))
+		input_dir.x--;
+	if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D))
+		input_dir.x++;
 
 	/* Tiro */
 
 	shot_cooldown--;
 	combo_timer--;
 
-	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
-		#if (!DEBUG_BULLET_NOCOOLDOWN)
+	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE))
+	{
+#if (!DEBUG_BULLET_NOCOOLDOWN)
 		if (shot_cooldown <= 0)
-        #endif
+#endif
 		{
 			/* Atirar */
 
@@ -139,15 +155,17 @@ void Level_Update() {
 
 			PlaySound(sounds.gunshot);
 		}
-		#if (!DEBUG_BULLET_NOCOOLDOWN)
-		else {
+#if (!DEBUG_BULLET_NOCOOLDOWN)
+		else
+		{
 			PlaySound(sounds.empty_gun);
 		}
-		#endif
+#endif
 	}
 
 	// Se a bala estiver ativa, atualizar seu estado
-	if (bullet.lifetime > 0) {
+	if (bullet.lifetime > 0)
+	{
 		update_bullet();
 	}
 
@@ -158,12 +176,12 @@ void Level_Update() {
 	// Desculpa pelo if esquisito, mas é a forma menos suja de enfiar a condicional de noclip
 	if (
 		is_in_bounds(target_position)
-		
-		#if (!DEBUG_PLAYER_NOCLIP)
-		&& !is_on_tile(target_position, T_WALL)
-		&& !is_on_tile(target_position, T_BURIED)
-		#endif
-	) {
+
+#if (!DEBUG_PLAYER_NOCLIP)
+		&& !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)
+#endif
+		)
+	{
 		is_enemy_at_Args args;
 
 		player_position = target_position;
@@ -174,7 +192,8 @@ void Level_Update() {
 		// Testar colisão com inimigos
 		foreach_enemy(&is_enemy_at, &args);
 
-		if (args.is_any_enemy_at) {
+		if (args.is_any_enemy_at)
+		{
 			enemy_touches_player = 1;
 		}
 	}
@@ -185,11 +204,15 @@ void Level_Update() {
 
 	/* Colisões */
 
+	//Jogador e coletáveis
+	check_collectable();
+
 	// Jogador e inimigo
-	if (enemy_touches_player) {
-		#if (!DEBUG_PLAYER_INVINCIBILITY)
+	if (enemy_touches_player)
+	{
+#if (!DEBUG_PLAYER_INVINCIBILITY)
 		player_enemy_collision();
-		#endif
+#endif
 
 		enemy_touches_player = 0;
 	}
@@ -253,7 +276,8 @@ void Level_Draw() {
 	}
 }
 
-void load_map(const char* file_name) {
+void load_map(const char* file_name) { 
+
 	FILE* file;
 
 	// `fopen()` dava erro no VS pois é considerado deprecado.
@@ -647,4 +671,36 @@ void check_collectable() {
 			break;
 		}
 	}
+}
+
+void make_name(char map_name[], int next_level) { //Refaz o nome do mapa a ser chamado em Level_Init() para carregar o mapa do novo nível
+	strcpy(map_name, "resources/maps/mapa");
+	sprintf(map_name, "%s%d.txt", map_name, next_level);
+}
+
+void print_lives(Vec2 caixa) { //Precisa ser chamada a cada contato com inimigo
+	char lives_string[12];
+
+	strcpy(lives_string, "Lives: ");
+	sprintf(lives_string, "%s%d", lives_string, lives);
+	strcat(lives_string, "/3"); //Hardcoded mesmo. Pra dar aquele efeito de "5/3" quando a gente colocar os powerups de Life Up - Vulgo cogumelo verde do Mário
+	DrawText(lives_string, caixa.x, caixa.y, FONT_SIZE, COLOR_LIVES);
+}
+
+void print_score(Vec2 caixa) { //Precisa ser chamada cada vez que um item for coletado
+	char score_string[24];
+
+	strcpy(score_string, "Score: ");
+	sprintf(score_string, "%s%d", score_string, score);
+	DrawText(score_string, caixa.x, caixa.y, FONT_SIZE, COLOR_SCORE);
+}
+
+void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeralda for coletada
+	char emerald_string[18];
+
+	strcpy(emerald_string, "Emeralds: ");
+	sprintf(emerald_string, "%s%d", emerald_string, level_completion);
+	strcat(emerald_string, "/");
+	strcat(emerald_string, level_max_emeralds/*Dá um jeito nessa variável - o número de esmeraldas varia de nível para nível*/);
+	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
 }
