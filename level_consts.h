@@ -52,3 +52,11 @@
 #define MAX_ENEMY_MOVE_COOLDOWN 150  // Delay máximo para o movimento do inimigo
 #define INITIAL_MOVE_COOLDOWN   1200 // Delay fixo inicial para o início do movimento do inimigo
 #define ENEMY_REDIRECT_CHANCE   .2   // Chance de o inimigo mudar de direção a cada passo
+
+//Coletáveis
+#define EMERALD_POINTS 150 //Incremento na pontuação ao coletar esmeraldas
+#define GOLD_POINTS 100 //Incremento na pontuação ao coletar ouro
+#define POWERUP_POINTS 200 //Incremento na pontuação ao coletar powerups
+
+//Power-Up's
+#define POWERUP_DURATION 3 //Duração do Powerup; 3s vezes o número de frames por segundo

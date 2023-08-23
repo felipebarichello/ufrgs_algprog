@@ -32,10 +32,11 @@ void defrag_pool();
 char is_in_sight(Vec2 pos);
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(PooledEnemy* enemy, void*);
+void check_collectable(int* sight_radius, int* score, int* level_completion);
 
 
 Vec2 level_size, level_offset;
-int unit_length, sight_radius;
+int unit_length, sight_radius, level_completion;
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 
@@ -44,6 +45,7 @@ EnemyPool initial_enemy_pool;
 
 Vec2 initial_player_position;
 Vec2 player_position;
+int score;
 
 int shot_cooldown;
 float bullet_speed;
@@ -69,6 +71,9 @@ void Level_Init() {
 
 	sight_radius = BASE_SIGHT_RADIUS;
 	bullet_speed = BULLET_SPEED / FPS;
+
+	score = 0;
+	level_completion = 0;
 	
 	load_map("resources/maps/001.map");
 
@@ -607,5 +612,39 @@ void draw_tile(Vec2 position, Color color) {
 void draw_enemy(PooledEnemy* enemy, void* _) {
 	if (is_in_sight(enemy->enemy.position)) {
 		draw_tile(enemy->enemy.position, COLOR_ENEMY);
+	}
+}
+
+// Verificar se o jogador está em cima de um coletável
+void check_collectable() {
+	int i;
+
+	if (map[player_position.y][player_position.x] != T_EMPTY) {
+		char *collectable = &map[player_position.y][player_position.x];
+
+		switch (*collectable) {
+
+		case T_EMERALD:
+			score += EMERALD_POINTS;
+			level_completion++;
+			*collectable = T_EMPTY;
+			break;
+		case T_GOLD:
+			score += GOLD_POINTS;
+			*collectable = T_EMPTY;
+			break;
+		case T_POWERUP:
+			score += POWERUP_POINTS;
+			sight_radius = 1000 * BASE_SIGHT_RADIUS;
+			i = POWERUP_DURATION * FPS;
+			do
+			{
+				i--;
+			} while (i > 0);
+			if (i <= 0) {
+				sight_radius = BASE_SIGHT_RADIUS;
+			}
+			break;
+		}
 	}
 }
