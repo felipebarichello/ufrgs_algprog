@@ -37,11 +37,13 @@ void print_emeralds(Vec2 caixa);
 void print_score(Vec2 caixa);
 void print_lives(Vec2 caixa);
 void make_name(char map_name[], int next_level);
+void check_level_complete();
+int make_savestate(const char* path); //Não consegui dar um jeito de testar a posição dos inimigos...
 
 
 Vec2 level_size, level_offset;
 int unit_length, sight_radius, level_completion;
-char map_name[256]; //Será que é uma boa deixar isso como var. global? Se sim, melhor tirar o map_name dos parâmetros de make_name()
+char map_name[18]; //Será que é uma boa deixar isso como var. global? Se sim, melhor tirar o map_name dos parâmetros de make_name()
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 int level_max_emeralds;
@@ -703,4 +705,45 @@ void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeral
 	strcat(emerald_string, "/");
 	strcat(emerald_string, level_max_emeralds/*Dá um jeito nessa variável - o número de esmeraldas varia de nível para nível*/);
 	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
+}
+
+void check_level_complete() {
+
+	if (level_completion == level_max_emeralds) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+int make_savestate(const char* path) {
+	FILE* fptr;
+	is_enemy_at_Args args;
+	int i, j;
+
+	if (!(fptr = fopen(path, "w"))) {
+		perror("Erro ao criar arquivo");
+		return 0;
+	}
+	else {
+		for (j = 0; j < MAX_LEVEL_WIDTH; j++) {
+			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {
+				args.position.x = j;
+				args.position.y = i;
+				if (player_position.x == j && player_position.y == i) {
+					map[i][j] = 'J';
+				}
+				Vec2Equals(enemy.position, args.position);
+				if (args.is_any_enemy_at == 1) {
+					map[i][j] == 'T';
+				}
+
+				fprintf(fptr, "%c", map[i][j]);
+			}
+			fprintf(fptr, "\n");
+		}
+		fclose(fptr);
+		return 1;
+	}
 }
