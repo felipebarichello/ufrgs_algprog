@@ -60,3 +60,9 @@
 
 //Power-Up's
 #define POWERUP_DURATION 3 //Duração do Powerup; 3s vezes o número de frames por segundo
+
+//Texto em tela
+#define COLOR_LIVES RED
+#define COLOR_EMERALD_TEXT GREEN
+#define COLOR_SCORE BLUE
+#define FONT_SIZE 18
