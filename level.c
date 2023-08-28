@@ -218,6 +218,20 @@ void Level_Update()
 
 		enemy_touches_player = 0;
 	}
+
+	/*Imprimir informações de vidas, score e esmeraldas*/
+	Vec2 text_box;
+	
+	text_box.x = 10;
+	text_box.y = 610;
+	print_lives(text_box);
+
+	text_box.x += 260;
+	print_emeralds(text_box);
+
+	text_box.x += 260;
+	print_score(text_box);
+
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
@@ -676,34 +690,34 @@ void check_collectable() {
 }
 
 void make_name(char map_name[], int next_level) { //Refaz o nome do mapa a ser chamado em Level_Init() para carregar o mapa do novo nível
-	strcpy(map_name, "resources/maps/mapa");
-	sprintf(map_name, "%s%d.txt", map_name, next_level);
+	strcpy_s(map_name, sizeof(map_name), "resources/maps/mapa");
+	sprintf_s(map_name, sizeof(map_name), "%s%d.txt", map_name, next_level);
 }
 
 void print_lives(Vec2 caixa) { //Precisa ser chamada a cada contato com inimigo
 	char lives_string[12];
 
-	strcpy(lives_string, "Lives: ");
-	sprintf(lives_string, "%s%d", lives_string, lives);
-	strcat(lives_string, "/3"); //Hardcoded mesmo. Pra dar aquele efeito de "5/3" quando a gente colocar os powerups de Life Up - Vulgo cogumelo verde do Mário
+	strcpy_s(lives_string, sizeof(lives_string), "Lives: ");
+	sprintf_s(lives_string, "%s%d", sizeof(lives_string), lives_string, lives);
+	strcat_s(lives_string, sizeof(lives_string), "/3"); //Hardcoded mesmo. Pra dar aquele efeito de "5/3" quando a gente colocar os powerups de Life Up - Vulgo cogumelo verde do Mário
 	DrawText(lives_string, caixa.x, caixa.y, FONT_SIZE, COLOR_LIVES);
 }
 
 void print_score(Vec2 caixa) { //Precisa ser chamada cada vez que um item for coletado
 	char score_string[24];
 
-	strcpy(score_string, "Score: ");
-	sprintf(score_string, "%s%d", score_string, score);
+	strcpy_s(score_string, sizeof(score_string), "Score: ");
+	sprintf_s(score_string, sizeof(score_string), "%s%d", score_string, score);
 	DrawText(score_string, caixa.x, caixa.y, FONT_SIZE, COLOR_SCORE);
 }
 
 void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeralda for coletada
 	char emerald_string[18];
 
-	strcpy(emerald_string, "Emeralds: ");
-	sprintf(emerald_string, "%s%d", emerald_string, level_completion);
-	strcat(emerald_string, "/");
-	strcat(emerald_string, level_max_emeralds/*Dá um jeito nessa variável - o número de esmeraldas varia de nível para nível*/);
+	strcpy_s(emerald_string, sizeof(emerald_string), "Emeralds: ");
+	sprintf_s(emerald_string, sizeof(emerald_string), "%s%d", emerald_string, level_completion);
+	strcat_s(emerald_string, sizeof(emerald_string), "/");
+	strcat_s(emerald_string, sizeof(emerald_string), level_max_emeralds);
 	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
 }
 
@@ -719,10 +733,11 @@ void check_level_complete() {
 
 int make_savestate(const char* path) {
 	FILE* fptr;
+	FILE* buff;
 	is_enemy_at_Args args;
 	int i, j;
 
-	if (!(fptr = fopen(path, "w"))) {
+	if (!(fptr = fopen_s(&buff, path, "w"))) {
 		perror("Erro ao criar arquivo");
 		return 0;
 	}
@@ -732,11 +747,11 @@ int make_savestate(const char* path) {
 				args.position.x = j;
 				args.position.y = i;
 				if (player_position.x == j && player_position.y == i) {
-					map[i][j] = 'J';
+					map[i][j] = T_PLAYER;
 				}
-				Vec2Equals(enemy.position, args.position);
+				//Vec2Equals(enemy.position, args.position);
 				if (args.is_any_enemy_at == 1) {
-					map[i][j] == 'T';
+					map[i][j] == T_ENEMY;
 				}
 
 				fprintf(fptr, "%c", map[i][j]);
