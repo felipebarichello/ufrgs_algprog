@@ -725,6 +725,6 @@ void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeral
 }
 
 int check_level_complete() {
-	return level_completion == level_max_emeralds;
+	return level_completion >= level_max_emeralds;
 }
 
