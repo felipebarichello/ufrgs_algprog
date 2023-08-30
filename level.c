@@ -37,7 +37,7 @@ void print_emeralds(Vec2 caixa);
 void print_score(Vec2 caixa);
 void print_lives(Vec2 caixa);
 void make_name(char map_name[], int next_level);
-void check_level_complete();
+int check_level_complete();
 
 
 
@@ -724,13 +724,7 @@ void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeral
 	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
 }
 
-void check_level_complete() {
-
-	if (level_completion == level_max_emeralds) {
-		return 1;
-	}
-	else {
-		return 0;
-	}
+int check_level_complete() {
+	return level_completion == level_max_emeralds;
 }
 
