@@ -38,7 +38,7 @@ void print_score(Vec2 caixa);
 void print_lives(Vec2 caixa);
 void make_name(char map_name[], int next_level);
 void check_level_complete();
-int make_savestate(const char* path); //Não consegui dar um jeito de testar a posição dos inimigos...
+
 
 
 Vec2 level_size, level_offset;
@@ -303,7 +303,7 @@ void load_map(const char* file_name) {
 	// https://learn.microsoft.com/pt-br/cpp/c-runtime-library/reference/fopen-s-wfopen-s?view=msvc-170
 	if (fopen_s(&file, file_name, "rb") != 0) {
 		// Deu erro. Não abriu.
-		printf("ERRO: Falha ao carregar mapa\n");
+		perror("ERRO: Falha ao carregar mapa\n");
 	} else {
 		int i, j, line_start = 0;
 		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
@@ -539,6 +539,8 @@ void update_enemy(PooledEnemy* pooled_enemy, void* _) {
 		pooled_enemy->active = 0;
 		bullet.lifetime = 0;
 
+		score += ENEMY_POINTS;
+
 		PlaySound(sounds.kill);
 
 		if (combo == -1) {
@@ -594,6 +596,7 @@ void update_bullet() {
 // O que acontece quando o jogador toca um inimigo
 void player_enemy_collision() {
 	soft_reset();
+	lives--;
 }
 
 // Verificar se o inimigo está na posição
@@ -731,34 +734,3 @@ void check_level_complete() {
 	}
 }
 
-int make_savestate(const char* path) {
-	FILE* fptr;
-	FILE* buff;
-	is_enemy_at_Args args;
-	int i, j;
-
-	if (!(fptr = fopen_s(&buff, path, "w"))) {
-		perror("Erro ao criar arquivo");
-		return 0;
-	}
-	else {
-		for (j = 0; j < MAX_LEVEL_WIDTH; j++) {
-			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {
-				args.position.x = j;
-				args.position.y = i;
-				if (player_position.x == j && player_position.y == i) {
-					map[i][j] = T_PLAYER;
-				}
-				//Vec2Equals(enemy.position, args.position);
-				if (args.is_any_enemy_at == 1) {
-					map[i][j] == T_ENEMY;
-				}
-
-				fprintf(fptr, "%c", map[i][j]);
-			}
-			fprintf(fptr, "\n");
-		}
-		fclose(fptr);
-		return 1;
-	}
-}
