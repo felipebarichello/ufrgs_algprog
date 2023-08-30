@@ -42,7 +42,7 @@ int check_level_complete();
 
 
 Vec2 level_size, level_offset;
-int unit_length, sight_radius, level_completion;
+int unit_length, sight_radius, emeralds_collected;
 char map_name[18]; //Será que é uma boa deixar isso como var. global? Se sim, melhor tirar o map_name dos parâmetros de make_name()
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
@@ -80,7 +80,7 @@ void Level_Init() {
 	sight_radius = BASE_SIGHT_RADIUS;
 	bullet_speed = BULLET_SPEED / FPS;
 
-	level_completion = 0;
+	emeralds_collected = 0;
 	level_max_emeralds = 0;
 	
 	load_map("resources/maps/001.map");
@@ -669,7 +669,7 @@ void check_collectable() {
 
 		case T_EMERALD:
 			score += EMERALD_POINTS;
-			level_completion++;
+			emeralds_collected++;
 			*collectable = T_EMPTY;
 			break;
 		case T_GOLD:
@@ -718,13 +718,13 @@ void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeral
 	char emerald_string[18];
 
 	strcpy_s(emerald_string, sizeof(emerald_string), "Emeralds: ");
-	sprintf_s(emerald_string, sizeof(emerald_string), "%s%d", emerald_string, level_completion);
+	sprintf_s(emerald_string, sizeof(emerald_string), "%s%d", emerald_string, emeralds_collected);
 	strcat_s(emerald_string, sizeof(emerald_string), "/");
 	strcat_s(emerald_string, sizeof(emerald_string), level_max_emeralds);
 	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
 }
 
 int check_level_complete() {
-	return level_completion >= level_max_emeralds;
+	return emeralds_collected >= level_max_emeralds;
 }
 
