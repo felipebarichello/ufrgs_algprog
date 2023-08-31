@@ -40,7 +40,6 @@ void check_collectable();
 void print_emeralds(Vec2 caixa);
 void print_score(Vec2 caixa);
 void print_lives(Vec2 caixa);
-void make_name(char map_name[], int next_level);
 int check_level_complete();
 int make_savestate(const char* path);
 void write_enemy_position(PooledEnemy* enemy, FILE* fptr);
@@ -729,11 +728,6 @@ void check_collectable() {
 			break;
 		}
 	}
-}
-
-void make_name(char map_name[], int next_level) { //Refaz o nome do mapa a ser chamado em Level_Init() para carregar o mapa do novo nível
-	strcpy_s(map_name, sizeof(map_name), "resources/maps/mapa");
-	sprintf_s(map_name, sizeof(map_name), "%s%d.txt", map_name, next_level);
 }
 
 void print_lives(Vec2 caixa) { //Precisa ser chamada a cada contato com inimigo
