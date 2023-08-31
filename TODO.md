@@ -8,9 +8,9 @@
     [x] Perder vida = reset inimigos vivos e jogador; apenas
 
 [ ] Pontos //Guto
-    Esmeralda - 100
-    Ouro - 50
-    Touperia - 200
+    [ ] Esmeralda - 100
+    [ ] Ouro - 50
+    [ ] Toupeira - 200
 
 [x] Tiro
     [x] Único
@@ -23,8 +23,6 @@
         Coletar todas implica fim da fase
     [x] Power up
         *Visibilidade mapa inteiro (3s)
-    [ ] Life Up - maybe
-        etc.
         
 [ ] HUD //Guto
     Vidas
