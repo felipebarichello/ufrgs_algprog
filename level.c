@@ -226,6 +226,17 @@ void Level_Update()
 
 		enemy_touches_player = 0;
 	}
+
+	/*Imprimir informações de vidas, score e esmeraldas*/
+
+	print_lives(text_box);
+
+	text_box.x += 260;
+	print_emeralds(text_box);
+
+	text_box.x += 260;
+	print_score(text_box);
+
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
@@ -284,16 +295,6 @@ void Level_Draw() {
 			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
 		EndRotation();
 	}
-
-	/*Imprimir informações de vidas, score e esmeraldas*/
-
-	print_lives(text_box);
-
-	text_box.x += 260;
-	print_emeralds(text_box);
-
-	text_box.x += 260;
-	print_score(text_box);
 
 }
 
