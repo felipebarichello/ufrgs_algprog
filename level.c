@@ -18,6 +18,8 @@ typedef struct {
 	char is_any_enemy_at;
 } is_enemy_at_Args;
 
+void new_game();
+void load_save();
 void load_map(const char* file_name);
 void load_sounds();
 void soft_reset();
@@ -51,7 +53,7 @@ char map_name[18];
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 int level_max_emeralds, max_level, next_level = 1;
-char level_map_path[64] = "resources/maps/001.map";
+char level_map_path[64];
 
 EnemyPool enemy_pool;
 EnemyPool initial_enemy_pool;
@@ -78,8 +80,6 @@ Vec2 text_box;
 
 // Chamada quando o jogo deve inicializar
 void Level_Init(Level_Args* args) {
-	int i, j;
-
 	text_box.x = 10;
 	text_box.y = 10;
 
@@ -92,37 +92,13 @@ void Level_Init(Level_Args* args) {
 
 	emeralds_collected = 0;
 	level_max_emeralds = 0;
-	
-	load_map(level_map_path);
 
 	enemy_touches_player = 0;
 
-	for (i = 0; i < ENEMY_MAX; i++) {
-		initial_enemy_pool.pool[i].active = 0;
-	}
-
-	initial_enemy_pool.lower_bound = 0;
-	initial_enemy_pool.upper_bound = 0;
-	
-	// Spawnar entidades e contar esmeraldas baseado no mapa
-	for (i = 0; i < level_size.y; i++) {
-		for (j = 0; j < level_size.x; j++) {
-			Vec2 matrix_position = {j, i};
-
-			switch (map[i][j]) {
-				case T_PLAYER:
-					player_position = initial_player_position = matrix_position;
-					break;
-
-				case T_ENEMY:
-					spawn_enemy(matrix_position, &initial_enemy_pool);
-					break;
-
-				case T_EMERALD:
-					level_max_emeralds++;
-					break;
-			}
-		}
+	if (args->load_saved_game) {
+		// load_save();
+	} else {
+		new_game();
 	}
 
 	soft_reset();
@@ -246,7 +222,8 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 		sprintf(map_name, "%s%d", map_name, next_level);
 		strcat(map_name, ".map");
 		strcat(level_map_path, map_name);
-		Level_Init();
+
+		Level_Init(data, set_scene);
 	}
 }
 
@@ -315,6 +292,43 @@ void Level_Draw(void* data) {
 
 	text_box.x += 260;
 	print_score(text_box);
+}
+
+void new_game() {
+	int i, j;
+
+	emeralds_collected = 0;
+	level_max_emeralds = 0;
+	
+	load_map("resources/maps/001.map");
+
+	for (i = 0; i < ENEMY_MAX; i++) {
+		initial_enemy_pool.pool[i].active = 0;
+	}
+
+	initial_enemy_pool.lower_bound = 0;
+	initial_enemy_pool.upper_bound = 0;
+	
+	// Spawnar entidades e contar esmeraldas baseado no mapa
+	for (i = 0; i < level_size.y; i++) {
+		for (j = 0; j < level_size.x; j++) {
+			Vec2 matrix_position = {j, i};
+
+			switch (map[i][j]) {
+				case T_PLAYER:
+					player_position = initial_player_position = matrix_position;
+					break;
+
+				case T_ENEMY:
+					spawn_enemy(matrix_position, &initial_enemy_pool);
+					break;
+
+				case T_EMERALD:
+					level_max_emeralds++;
+					break;
+			}
+		}
+	}
 }
 
 void load_map(const char* file_name) { 
