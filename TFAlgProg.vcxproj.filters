@@ -44,7 +44,7 @@
       <Filter>Source files\Game\Scenes\Menu</Filter>
     </ClCompile>
     <ClCompile Include="map_reader.c">
-      <Filter>Source files\Game\Scenes</Filter>
+      <Filter>Source files\Game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,6 +68,9 @@
     </ClInclude>
     <ClInclude Include="menu.h">
       <Filter>Source files\Game\Scenes\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="map_reader.h">
+      <Filter>Source files\Game</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
