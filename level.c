@@ -49,7 +49,7 @@ int unit_length, sight_radius, emeralds_collected;
 char map_name[18]; //Será que é uma boa deixar isso como var. global? Se sim, melhor tirar o map_name dos parâmetros de make_name()
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
-int level_max_emeralds;
+int level_max_emeralds, max_level;
 
 EnemyPool enemy_pool;
 EnemyPool initial_enemy_pool;
