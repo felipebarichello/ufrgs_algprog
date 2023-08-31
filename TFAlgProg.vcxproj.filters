@@ -17,6 +17,9 @@
     <Filter Include="Source files\Game\Scenes\Level">
       <UniqueIdentifier>{61a602ae-2162-44fd-a1ba-1b74d465ee04}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source files\Game\Scenes\Menu">
+      <UniqueIdentifier>{91fd16b1-06a9-4179-8326-4abaf31bf2b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="level.c">
@@ -37,6 +40,12 @@
     <ClCompile Include="main.c">
       <Filter>Source files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="menu.c">
+      <Filter>Source files\Game\Scenes\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="map_reader.c">
+      <Filter>Source files\Game\Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="level.h">
@@ -56,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="gamelib.h">
       <Filter>Source files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>Source files\Game\Scenes\Menu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
