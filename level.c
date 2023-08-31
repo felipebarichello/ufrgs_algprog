@@ -79,8 +79,8 @@ Vec2 text_box;
 
 // Chamada quando o jogo deve inicializar
 void Level_Init(Level_Args* args) {
-	text_box.x = 10;
-	text_box.y = 10;
+	text_box.x = 0;
+	text_box.y = 0;
 
 	SetTargetFPS(FPS);
 	
@@ -207,6 +207,7 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 
 	/*Imprimir informações de vidas, score e esmeraldas*/
 
+	text_box.x = 0;
 	print_lives(text_box);
 
 	text_box.x += 260;
@@ -286,6 +287,7 @@ void Level_Draw(void* data) {
 	}
 	/*Imprimir informações de vidas, score e esmeraldas*/
 
+	text_box.x = 0;
 	print_lives(text_box);
 
 	text_box.x += 260;
