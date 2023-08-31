@@ -5,7 +5,7 @@
 #include "level.h"
 #include "scene.h"
 #include "level_consts.h"
-
+/*
 scene(Menu)
 
 char map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
@@ -62,3 +62,4 @@ void read_enemy_position(PooledEnemy* enemy, FILE* fptr) {
 void new_game() {
 	SetScene(Level_Scene());
 }
+*/
