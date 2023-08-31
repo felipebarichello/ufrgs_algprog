@@ -1,42 +1,32 @@
 #include "level_lib.h"
 #include <stdio.h>
 #include "map_reader.c"
-/*
 #include "engine.h"
-#include <stdlib.h>
-
-#include <math.h>
-#include <string.h>
-
-//#include "level.c"
-//
-
-//#include "scene.h"
+#include "level.h"
+#include "scene.h"
 
 scene(Menu)
 
-
- //Não consegui dar um jeito de testar a posição dos inimigos...
-int load_savestate(const char* path);
-void back_to_level();
-void new_game();
-
-// Chamada quando o jogo deve inicializar
-void Menu_Init() {
-
-}
-
-// Chamada entre BeginDrawing() e EndDrawing() em cada frame
-void Menu_Draw() {
-	
-}
-
-*/
 char map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 int score, lives, emeralds_collected;
 
 int load_savestate(const char* path);
 void read_enemy_position(PooledEnemy* enemy, FILE* fptr);
+void new_game();
+
+void Menu_Init() {
+	SetTargetFPS(FPS);
+}
+
+void Menu_Update() {
+	
+}
+
+void Menu_Draw() {
+	DrawText("Over Engineered Pac Mine", 250, 100, 36, RED);
+
+
+}
 
 int load_savestate(const char* path) {
 	FILE* fptr;
@@ -60,4 +50,9 @@ int load_savestate(const char* path) {
 
 void read_enemy_position(PooledEnemy* enemy, FILE* fptr) {
 	fscanf(fptr, "%d	%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
+}
+
+
+void new_game() {
+	SetScene(Level_Scene());
 }
