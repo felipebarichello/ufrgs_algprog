@@ -6,4 +6,4 @@
 
 #include "engine.h"
 
-Scene Menu_Scene();
+Scene Menu_Scene;
