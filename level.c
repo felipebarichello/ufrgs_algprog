@@ -38,6 +38,8 @@ void print_score(Vec2 caixa);
 void print_lives(Vec2 caixa);
 void make_name(char map_name[], int next_level);
 int check_level_complete();
+int make_savestate(const char* path);
+void write_enemy_position(PooledEnemy* enemy, FILE* fptr);
 
 
 
@@ -68,10 +70,15 @@ int combo_timer;
 
 LevelSounds sounds;
 
+Vec2 text_box;
+
 
 // Chamada quando o jogo deve inicializar
 void Level_Init() {
 	int i, j;
+
+	text_box.x = 10;
+	text_box.y = 610;
 
 	SetTargetFPS(FPS);
 	
@@ -220,10 +227,7 @@ void Level_Update()
 	}
 
 	/*Imprimir informações de vidas, score e esmeraldas*/
-	Vec2 text_box;
 	
-	text_box.x = 10;
-	text_box.y = 610;
 	print_lives(text_box);
 
 	text_box.x += 260;
@@ -728,3 +732,40 @@ int check_level_complete() {
 	return emeralds_collected >= level_max_emeralds;
 }
 
+int make_savestate(const char* path) { //Savestates são salvos como arquivos de texto, porque só haverá suporte para um de cada vez 
+	FILE* fptr;
+	FILE* buff;
+	//is_enemy_at_Args args;
+	int i, j;
+
+	if (!(fptr = fopen_s(&buff, path, "w"))) {
+		perror("Erro ao criar arquivo");
+		return 0;
+	}
+	else {
+		for (j = 0; j < MAX_LEVEL_WIDTH; j++) { //Escreve o mapa contido na tela quando o jogador chamou o menu, com inimigos e player
+			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {//Acabei de me dar conta de um problema: as toupeiras podem acabar sobrescrevendo áreas soterradas. Seria melhor não mexer no mapa e só guardar as posições de todas as toupeiras? Acho até que é mais fácil...
+
+				if (player_position.x == j && player_position.y == i) {
+					map[i][j] = T_PLAYER;
+				}
+
+				fprintf(fptr, "%c", map[i][j]);
+			}
+			fprintf(fptr, "\n");
+			foreach_enemy(&write_enemy_position, &fptr);
+		}
+		fprintf(fptr, "\n\n");
+		fprintf(fptr, "%d	%d	%d", lives, emeralds_collected, score);
+
+
+		fclose(fptr);
+		return 1;
+	}
+}
+
+
+//Compatível com foreach_enemy
+void write_enemy_position(PooledEnemy* enemy, FILE* fptr) {
+	fprintf(fptr, "%d	%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
+}
