@@ -11,10 +11,14 @@
 
 int main() {
 	EngineBuilder builder;
+	Level_Args level_args;
 
 	builder.window_name = "Pac-Mine";
 	builder.window_size = (Vec2){ WINDOW_WIDTH, WINDOW_HEIGHT };
 	builder.initial_scene = Level_Scene();
+
+	level_args.load_saved_game = 0;
+	builder.initial_scene_args = &(Level_Args){0};
 
 	StartEngine(&builder);
 
