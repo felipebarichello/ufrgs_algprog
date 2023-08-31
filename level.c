@@ -49,7 +49,8 @@ int unit_length, sight_radius, emeralds_collected;
 char map_name[18]; //Será que é uma boa deixar isso como var. global? Se sim, melhor tirar o map_name dos parâmetros de make_name()
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
-int level_max_emeralds, max_level;
+int level_max_emeralds, max_level, next_level = 1;
+char level_map_path[64] = "resources/maps/001.map";
 
 EnemyPool enemy_pool;
 EnemyPool initial_enemy_pool;
@@ -91,7 +92,7 @@ void Level_Init() {
 	emeralds_collected = 0;
 	level_max_emeralds = 0;
 	
-	load_map("resources/maps/001.map");
+	load_map(level_map_path);
 
 	enemy_touches_player = 0;
 
@@ -237,6 +238,16 @@ void Level_Update()
 	text_box.x += 260;
 	print_score(text_box);
 
+	
+	if (check_level_complete()) {
+		next_level++;
+		strcpy(level_map_path, "resources/maps/");
+		strcpy(map_name, "mapa");
+		sprintf(map_name, "%s%d", map_name, next_level);
+		strcat(map_name, ".map");
+		strcat(level_map_path, map_name);
+		Level_Init();
+	}
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
@@ -295,7 +306,15 @@ void Level_Draw() {
 			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
 		EndRotation();
 	}
+	/*Imprimir informações de vidas, score e esmeraldas*/
 
+	print_lives(text_box);
+
+	text_box.x += 260;
+	print_emeralds(text_box);
+
+	text_box.x += 260;
+	print_score(text_box);
 }
 
 void load_map(const char* file_name) { 
