@@ -25,26 +25,22 @@
         *Visibilidade mapa inteiro (3s)
         
 [ ] HUD //Guto
-    Vidas
-    Pontuacao
-    Nivel
-    Esmeraldas_coletadas / Esmeraldas_totais
+    [ ] Vidas
+    [ ] Pontuacao
+    [ ] Nivel
+    [ ] Esmeraldas_coletadas / Esmeraldas_totais
     
 [ ] Mapas //Guto
     [ ] Nome dinâmico
-        mapa1.txt
-        mapa2.txt
-        mapa3.txt
-        .
-        .
-        .
-        mapan.txt
+        [x] mapa1.txt
+        [ ] mapa2.txt
+        [ ] mapa3.txt
     [ ] Mínimo 3 mapas
         Mas deve ser dinâmico para qualquer numero de mapas
     [ ] Mínimo 30x20 (dimensões) cada um
     
-[ ] Tela inicial
-    [ ] Novo jogo
+[x] Menu principal inicial
+    [x] Novo jogo
     [ ] Carregar jogo
     [ ] Sair
 
