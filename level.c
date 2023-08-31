@@ -715,18 +715,18 @@ void print_lives(Vec2 caixa) { //Precisa ser chamada a cada contato com inimigo
 void print_score(Vec2 caixa) { //Precisa ser chamada cada vez que um item for coletado
 	char score_string[24];
 
-	strcpy_s(score_string, sizeof(score_string), "Score: ");
-	sprintf_s(score_string, sizeof(score_string), "%s%d", score_string, score);
+	strcpy(score_string, "Score: ");
+	sprintf(score_string, "%s%d", score_string, score);
 	DrawText(score_string, caixa.x, caixa.y, FONT_SIZE, COLOR_SCORE);
 }
 
 void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeralda for coletada
 	char emerald_string[18];
 
-	strcpy_s(emerald_string, sizeof(emerald_string), "Emeralds: ");
-	sprintf_s(emerald_string, sizeof(emerald_string), "%s%d", emerald_string, emeralds_collected);
-	strcat_s(emerald_string, sizeof(emerald_string), "/");
-	strcat_s(emerald_string, sizeof(emerald_string), level_max_emeralds);
+	strcpy(emerald_string, "Emeralds: ");
+	sprintf(emerald_string, "%s%d", emerald_string, emeralds_collected);
+	strcat(emerald_string, "/");
+	strcat(emerald_string, level_max_emeralds);
 	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
 }
 
