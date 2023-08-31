@@ -40,6 +40,7 @@ void make_name(char map_name[], int next_level);
 int check_level_complete();
 int make_savestate(const char* path);
 void write_enemy_position(PooledEnemy* enemy, FILE* fptr);
+int load_savestate(const char* path);
 
 
 
@@ -78,7 +79,7 @@ void Level_Init() {
 	int i, j;
 
 	text_box.x = 10;
-	text_box.y = 610;
+	text_box.y = 10;
 
 	SetTargetFPS(FPS);
 	
@@ -225,10 +226,6 @@ void Level_Update()
 
 		enemy_touches_player = 0;
 	}
-
-	/*Imprimir informações de vidas, score e esmeraldas*/
-	
-
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
@@ -288,13 +285,15 @@ void Level_Draw() {
 		EndRotation();
 	}
 
+	/*Imprimir informações de vidas, score e esmeraldas*/
+
 	print_lives(text_box);
 
-	//text_box.x += 260;
-	//print_emeralds(text_box);
+	text_box.x += 260;
+	print_emeralds(text_box);
 
-	//text_box.x += 260;
-	//print_score(text_box);
+	text_box.x += 260;
+	print_score(text_box);
 
 }
 
@@ -704,12 +703,7 @@ void make_name(char map_name[], int next_level) { //Refaz o nome do mapa a ser c
 }
 
 void print_lives(Vec2 caixa) { //Precisa ser chamada a cada contato com inimigo
-	char lives_string[12];
-
-	strcpy(lives_string, "Lives: ");
-	sprintf(lives_string, "%s%d", lives_string, lives);
-	strcat(lives_string, "/3"); //Hardcoded mesmo. Pra dar aquele efeito de "5/3" quando a gente colocar os powerups de Life Up - Vulgo cogumelo verde do Mário
-	DrawText(lives_string, caixa.x, caixa.y, FONT_SIZE, COLOR_LIVES);
+	DrawText(TextFormat("Lives: %02i", lives), caixa.x, caixa.y, FONT_SIZE, RED);
 }
 
 void print_score(Vec2 caixa) { //Precisa ser chamada cada vez que um item for coletado
@@ -726,7 +720,7 @@ void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeral
 	strcpy(emerald_string, "Emeralds: ");
 	sprintf(emerald_string, "%s%d", emerald_string, emeralds_collected);
 	strcat(emerald_string, "/");
-	strcat(emerald_string, level_max_emeralds);
+	sprintf(emerald_string, "%s%d", emerald_string, level_max_emeralds);
 	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
 }
 
@@ -774,4 +768,31 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 //Compatível com foreach_enemy
 void write_enemy_position(PooledEnemy* enemy, FILE* fptr) {
 	fprintf(fptr, "%d	%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
+}
+
+int load_savestate(const char* path) {
+	FILE* fptr;
+	FILE* buff;
+	Vec2 aux_vec2;
+	EnemyPool pool;
+
+	if (!(fptr = fopen_s(&buff, path, "r"))) {
+		perror("Error in loading savestate");
+		return 0;
+	}
+	else {
+		read_map(map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH], fptr);
+		fgetc(fptr);
+		do {
+			fscanf_s(fptr, "%d", &aux_vec2.x);
+			_fgetchar(fptr);
+			fscanf_s(fptr, "%d", &aux_vec2.y);
+			_fgetchar(fptr);
+			spawn_enemy(aux_vec2, &pool);
+		} while (aux_vec2.y != -1);
+		fgetc(fptr);
+		fgetc(fptr);
+		fscanf_s(fptr, "%d	%d	%d", &lives, &emeralds_collected, &score);
+	}
+	return 1;
 }
