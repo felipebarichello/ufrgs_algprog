@@ -22,7 +22,7 @@ void soft_reset();
 void set_unit_length(int length);
 char is_in_bounds(Vec2 position);
 char is_on_tile(Vec2 pos, Tile tile);
-void spawn_enemy(Vec2 position);
+void spawn_enemy(Vec2 position, EnemyPool* pool);
 void foreach_enemy(void (*callback)(PooledEnemy* enemy, void* context), void* context);
 void update_enemy(PooledEnemy* pooled_enemy, void*);
 void update_bullet();
@@ -228,13 +228,6 @@ void Level_Update()
 
 	/*Imprimir informações de vidas, score e esmeraldas*/
 	
-	print_lives(text_box);
-
-	text_box.x += 260;
-	print_emeralds(text_box);
-
-	text_box.x += 260;
-	print_score(text_box);
 
 }
 
@@ -294,6 +287,15 @@ void Level_Draw() {
 			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
 		EndRotation();
 	}
+
+	print_lives(text_box);
+
+	//text_box.x += 260;
+	//print_emeralds(text_box);
+
+	//text_box.x += 260;
+	//print_score(text_box);
+
 }
 
 void load_map(const char* file_name) { 
@@ -704,9 +706,9 @@ void make_name(char map_name[], int next_level) { //Refaz o nome do mapa a ser c
 void print_lives(Vec2 caixa) { //Precisa ser chamada a cada contato com inimigo
 	char lives_string[12];
 
-	strcpy_s(lives_string, sizeof(lives_string), "Lives: ");
-	sprintf_s(lives_string, "%s%d", sizeof(lives_string), lives_string, lives);
-	strcat_s(lives_string, sizeof(lives_string), "/3"); //Hardcoded mesmo. Pra dar aquele efeito de "5/3" quando a gente colocar os powerups de Life Up - Vulgo cogumelo verde do Mário
+	strcpy(lives_string, "Lives: ");
+	sprintf(lives_string, "%s%d", lives_string, lives);
+	strcat(lives_string, "/3"); //Hardcoded mesmo. Pra dar aquele efeito de "5/3" quando a gente colocar os powerups de Life Up - Vulgo cogumelo verde do Mário
 	DrawText(lives_string, caixa.x, caixa.y, FONT_SIZE, COLOR_LIVES);
 }
 
@@ -737,6 +739,7 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 	FILE* buff;
 	//is_enemy_at_Args args;
 	int i, j;
+	const int const_neg_um = -1;
 
 	if (!(fptr = fopen_s(&buff, path, "w"))) {
 		perror("Erro ao criar arquivo");
@@ -744,7 +747,7 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 	}
 	else {
 		for (j = 0; j < MAX_LEVEL_WIDTH; j++) { //Escreve o mapa contido na tela quando o jogador chamou o menu, com inimigos e player
-			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {//Acabei de me dar conta de um problema: as toupeiras podem acabar sobrescrevendo áreas soterradas. Seria melhor não mexer no mapa e só guardar as posições de todas as toupeiras? Acho até que é mais fácil...
+			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {
 
 				if (player_position.x == j && player_position.y == i) {
 					map[i][j] = T_PLAYER;
@@ -757,7 +760,7 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 		}
 
 		foreach_enemy(&write_enemy_position, &fptr);
-		fprintf(fptr, "\\");
+		fprintf(fptr, "%d %d", const_neg_um, const_neg_um);
 		fprintf(fptr, "\n\n");
 		fprintf(fptr, "%d	%d	%d", lives, emeralds_collected, score);
 
