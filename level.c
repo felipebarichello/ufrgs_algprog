@@ -59,7 +59,7 @@ EnemyPool initial_enemy_pool;
 
 Vec2 initial_player_position;
 Vec2 player_position;
-int score = 0, lives = 3;
+int score, lives, powerup_timer;
 
 int shot_cooldown;
 float bullet_speed;
@@ -193,6 +193,12 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 	//Jogador e coletáveis
 	check_collectable();
 
+	if (powerup_timer <= 0) {
+		sight_radius = BASE_SIGHT_RADIUS;
+	} else {
+		powerup_timer--;
+	}
+
 	// Jogador e inimigo
 	if (enemy_touches_player)
 	{
@@ -298,6 +304,8 @@ void new_game() {
 
 	emeralds_collected = 0;
 	level_max_emeralds = 0;
+	lives = 3;
+	score = 0;
 	
 	load_map("resources/maps/001.map");
 
@@ -414,6 +422,7 @@ void load_sounds() {
 void soft_reset() {
 	// Resetar o jogador
 	player_position = initial_player_position;
+	powerup_timer = 0;
 
 	// Resetar os inimigos
 	memcpy(&enemy_pool, &initial_enemy_pool, sizeof(EnemyPool));
@@ -698,34 +707,28 @@ void draw_enemy(PooledEnemy* enemy, void* _) {
 
 // Verificar se o jogador está em cima de um coletável
 void check_collectable() {
-	int i;
-
 	if (map[player_position.y][player_position.x] != T_EMPTY) {
 		char *collectable = &map[player_position.y][player_position.x];
 
 		switch (*collectable) {
+			case T_EMERALD:
+				score += EMERALD_POINTS;
+				emeralds_collected++;
+				*collectable = T_EMPTY;
+				break;
 
-		case T_EMERALD:
-			score += EMERALD_POINTS;
-			emeralds_collected++;
-			*collectable = T_EMPTY;
-			break;
-		case T_GOLD:
-			score += GOLD_POINTS;
-			*collectable = T_EMPTY;
-			break;
-		case T_POWERUP:
-			score += POWERUP_POINTS;
-			sight_radius = 1000 * BASE_SIGHT_RADIUS;
-			i = POWERUP_DURATION * FPS;
-			do
-			{
-				i--;
-			} while (i > 0);
-			if (i <= 0) {
-				sight_radius = BASE_SIGHT_RADIUS;
-			}
-			break;
+			case T_GOLD:
+				score += GOLD_POINTS;
+				*collectable = T_EMPTY;
+				break;
+
+			case T_POWERUP:
+				score += POWERUP_POINTS;
+				sight_radius = 1000 * BASE_SIGHT_RADIUS;
+				powerup_timer = POWERUP_DURATION * FPS;
+
+				*collectable = T_EMPTY;
+				break;
 		}
 	}
 }
