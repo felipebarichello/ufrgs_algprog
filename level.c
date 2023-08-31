@@ -104,7 +104,7 @@ void Level_Init(Level_Args* args) {
 }
 
 // Chamada em cada frame antes de Draw()
-void Level_Update(void* data, void (*set_scene)(Scene scene)) {
+void Level_Update(void (*set_scene)(Scene scene)) {
 	Vec2 input_dir = { 0, 0 }, target_position;
 
 	/* Input de movimento */
@@ -225,12 +225,12 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 		strcat(map_name, ".map");
 		strcat(level_map_path, map_name);
 
-		Level_Init(data, set_scene);
+		Level_Init(&((Level_Args){0}));
 	}
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
-void Level_Draw(void* data) {
+void Level_Draw() {
 	int i, j;
 
 	// Limpar tela do frame anterior
