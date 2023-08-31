@@ -1,9 +1,10 @@
 #include "level_lib.h"
 #include <stdio.h>
-#include "map_reader.c"
+#include "map_reader.h"
 #include "engine.h"
 #include "level.h"
 #include "scene.h"
+#include "level_consts.h"
 
 scene(Menu)
 
@@ -23,9 +24,12 @@ void Menu_Update() {
 }
 
 void Menu_Draw() {
-	DrawText("Over Engineered Pac Mine", 250, 100, 36, RED);
+	ClearBackground(RAYWHITE);
 
-
+	DrawText("Over Engineered Pac Mine", 250, 100, 2*FONT_SIZE, RED);
+	DrawText("(N): Novo Jogo", 250, 250, FONT_SIZE, BLACK);
+	DrawText("(C): Carregar Jogo", 250, 300, FONT_SIZE, BLACK);
+	DrawText("(Q): Sair do Jogo", 250, 350, FONT_SIZE, BLACK);
 }
 
 int load_savestate(const char* path) {
@@ -42,14 +46,14 @@ int load_savestate(const char* path) {
 		foreach_enemy(&read_enemy_position, &fptr);
 		fgetc(fptr);
 		fgetc(fptr);
-		fscanf(fptr, "%d	%d	%d", &lives, &emeralds_collected, &score);
+		fscanf_s(fptr, "%d	%d	%d", &lives, &emeralds_collected, &score);
 		}
 		return 1;
 }
 
 
 void read_enemy_position(PooledEnemy* enemy, FILE* fptr) {
-	fscanf(fptr, "%d	%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
+	fscanf_s(fptr, "%d	%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
 }
 
 
