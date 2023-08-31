@@ -752,9 +752,12 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 
 				fprintf(fptr, "%c", map[i][j]);
 			}
+
 			fprintf(fptr, "\n");
-			foreach_enemy(&write_enemy_position, &fptr);
 		}
+
+		foreach_enemy(&write_enemy_position, &fptr);
+		fprintf(fptr, "\\");
 		fprintf(fptr, "\n\n");
 		fprintf(fptr, "%d	%d	%d", lives, emeralds_collected, score);
 
