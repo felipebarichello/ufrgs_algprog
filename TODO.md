@@ -2,55 +2,50 @@
 
 [x] Toupeira pode se mover por áreas soterradas
 	
-[x] Fog of war (9x9) - 
+[x] Fog of war (9x9)
 
-[ ] 3 vidas //Guto
+[ ] 3 vidas
     [x] Perder vida = reset inimigos vivos e jogador; apenas
+    [ ] Game over
 
-[ ] Pontos //Guto
-    [ ] Esmeralda - 100
-    [ ] Ouro - 50
-    [ ] Toupeira - 200
+[x] Pontos
+    [x] Esmeralda - 100
+    [x] Ouro - 50
+    [x] Toupeira - 200
 
 [x] Tiro
     [x] Único
     [x] Abre área soterrada
 
-[ ] Coletáveis //Guto
-    [ ] Ouro
-        Pontos
-    [ ] Esmeralda
-        Coletar todas implica fim da fase
+[x] Coletáveis
+    [x] Ouro
+        [x] pontos
+    [x] Esmeralda
+        [x] Coletar todas implica fim da fase
     [x] Power up
-        *Visibilidade mapa inteiro (3s)
+        [x] Visibilidade mapa inteiro (3s)
         
-[ ] HUD //Guto
-    [ ] Vidas
-    [ ] Pontuacao
+[ ] HUD
+    [x] Vidas
+    [x] Pontuacao
     [ ] Nivel
-    [ ] Esmeraldas_coletadas / Esmeraldas_totais
+    [x] Esmeraldas_coletadas / Esmeraldas_totais
     
-[ ] Mapas //Guto
+[ ] Mapas
     [ ] Nome dinâmico
-        [x] mapa1.txt
-        [ ] mapa2.txt
-        [ ] mapa3.txt
     [ ] Mínimo 3 mapas
-        Mas deve ser dinâmico para qualquer numero de mapas
+        [x] Mapa 1
+        [x] Mapa 2
+        [ ] Mapa 3
+    [ ] Mas é dinâmico para qualquer numero de mapas
     [ ] Mínimo 30x20 (dimensões) cada um
     
-[x] Menu principal inicial
-    [x] Novo jogo
-    [ ] Carregar jogo
-    [ ] Sair
+[x] Menu principal
+    [x] (N) Novo jogo
+    [ ] (C) Carregar jogo
+    [ ] (Q) Sair
 
-[ ] Game over
-    [ ] Casos
-        [ ] Win
-        [ ] Lose
-    [ ] Mostrar pontos
-    
-[ ] Menu  //Lipe
+[ ] Menu in-game
     [ ] (N) Novo Jogo: Quando o usuário seleciona esta opção, um novo jogo é iniciado, a partir do
 primeiro nível. Todo progresso e número de vidas do jogador também é resetado.
     [ ] (C) Carregar jogo: Quando o usuário seleciona esta opção, um jogo previamente salvo deve ser
@@ -64,6 +59,12 @@ jogar.
     [ ] (Q) Sair do jogo: Quando o usuário seleciona esta opção, o jogo é finalizado, sem salvar.
     [ ] (V) Voltar: Quando o usuário seleciona esta opção, deve-se abandonar o menu e o controle volta
 para o jogo, que continua do ponto em que parou quando o usuário acessou o menu.
+
+[ ] Game over
+    [ ] Casos
+        [ ] Win
+        [ ] Lose
+    [ ] Mostrar pontos
 
 ---
 
