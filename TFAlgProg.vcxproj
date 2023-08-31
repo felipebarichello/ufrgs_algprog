@@ -155,8 +155,11 @@
     <ClCompile Include="level_consts.h" />
     <ClCompile Include="main.c" />
     <ClCompile Include="level.c" />
+    <ClCompile Include="map_reader.c" />
+    <ClCompile Include="menu.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="menu.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="start_engine.h" />
     <ClInclude Include="engine.h" />

@@ -90,7 +90,7 @@ void Level_Init() {
 	level_completion = 0;
 	level_max_emeralds = 0;
 	
-	load_map("resources/maps/001.map");
+	load_map("resources/maps/001.map");//Vai ter que mudar isso aqui
 
 	enemy_touches_player = 0;
 
