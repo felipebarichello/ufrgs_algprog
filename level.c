@@ -123,11 +123,10 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 	shot_cooldown--;
 	combo_timer--;
 
-	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE))
-	{
-#if (!DEBUG_BULLET_NOCOOLDOWN)
+	if (IsMouseButtonPressed(0) || IsKeyPressed(KEY_G) || IsKeyPressed(KEY_SPACE)) {
+		#if (!DEBUG_BULLET_NOCOOLDOWN)
 		if (shot_cooldown <= 0)
-#endif
+		#endif
 		{
 			/* Atirar */
 
@@ -141,17 +140,16 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 
 			PlaySound(sounds.gunshot);
 		}
-#if (!DEBUG_BULLET_NOCOOLDOWN)
+		#if (!DEBUG_BULLET_NOCOOLDOWN)
 		else
 		{
 			PlaySound(sounds.empty_gun);
 		}
-#endif
+		#endif
 	}
 
 	// Se a bala estiver ativa, atualizar seu estado
-	if (bullet.lifetime > 0)
-	{
+	if (bullet.lifetime > 0) {
 		update_bullet();
 	}
 
@@ -163,11 +161,10 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 	if (
 		is_in_bounds(target_position)
 
-#if (!DEBUG_PLAYER_NOCLIP)
-		&& !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)
-#endif
-		)
-	{
+		#if (!DEBUG_PLAYER_NOCLIP)
+			&& !is_on_tile(target_position, T_WALL) && !is_on_tile(target_position, T_BURIED)
+		#endif
+	) {
 		is_enemy_at_Args args;
 
 		player_position = target_position;
@@ -200,11 +197,10 @@ void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 	}
 
 	// Jogador e inimigo
-	if (enemy_touches_player)
-	{
-#if (!DEBUG_PLAYER_INVINCIBILITY)
-		player_enemy_collision();
-#endif
+	if (enemy_touches_player) {
+		#if (!DEBUG_PLAYER_INVINCIBILITY)
+			player_enemy_collision();
+		#endif
 
 		enemy_touches_player = 0;
 	}
@@ -677,7 +673,7 @@ void defrag_pool() {
 char is_in_sight(Vec2 pos) {
 
 	#if (DEBUG_PLAYER_NIGHTVISION)
-	return 1;
+		return 1;
 	#endif
 
 	return Vec2Magnitude(SubVec2(pos, player_position)) < sight_radius // Verdadeiro se estiver dentro da visão do jogador
@@ -769,8 +765,7 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 	if (!(fptr = fopen_s(&buff, path, "w"))) {
 		perror("Erro ao criar arquivo");
 		return 0;
-	}
-	else {
+	} else {
 		for (j = 0; j < MAX_LEVEL_WIDTH; j++) { //Escreve o mapa contido na tela quando o jogador chamou o menu, com inimigos e player
 			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {
 
@@ -810,8 +805,7 @@ int load_savestate(const char* path) {
 	if (!(fptr = fopen_s(&buff, path, "r"))) {
 		perror("Error in loading savestate");
 		return 0;
-	}
-	else {
+	} else {
 		read_map(map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH], fptr);
 		fgetc(fptr);
 		do {
@@ -825,5 +819,6 @@ int load_savestate(const char* path) {
 		fgetc(fptr);
 		fscanf_s(fptr, "%d	%d	%d", &lives, &emeralds_collected, &score);
 	}
+
 	return 1;
 }
