@@ -18,10 +18,10 @@
 
 [ ] Coletáveis //Guto
     [ ] Ouro
-        pontos
+        Pontos
     [ ] Esmeralda
         Coletar todas implica fim da fase
-    [ ] Power up
+    [x] Power up
         *Visibilidade mapa inteiro (3s)
     [ ] Life Up - maybe
         etc.
