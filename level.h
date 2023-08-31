@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "engine.h"
+
 Scene Level_Scene();
 
 // Informação que a cena Level precisa para iniciar

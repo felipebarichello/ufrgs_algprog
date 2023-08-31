@@ -1,3 +1,5 @@
+#include "level.h"
+
 #include "engine.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,10 +45,9 @@ void write_enemy_position(PooledEnemy* enemy, FILE* fptr);
 int load_savestate(const char* path);
 
 
-
 Vec2 level_size, level_offset;
 int unit_length, sight_radius, emeralds_collected;
-char map_name[18]; //Será que é uma boa deixar isso como var. global? Se sim, melhor tirar o map_name dos parâmetros de make_name()
+char map_name[18];
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
 int level_max_emeralds, max_level, next_level = 1;
@@ -76,7 +77,7 @@ Vec2 text_box;
 
 
 // Chamada quando o jogo deve inicializar
-void Level_Init() {
+void Level_Init(Level_Args* args) {
 	int i, j;
 
 	text_box.x = 10;
@@ -128,8 +129,7 @@ void Level_Init() {
 }
 
 // Chamada em cada frame antes de Draw()
-void Level_Update()
-{
+void Level_Update(void* data, void (*set_scene)(Scene scene)) {
 	Vec2 input_dir = { 0, 0 }, target_position;
 
 	/* Input de movimento */
@@ -251,7 +251,7 @@ void Level_Update()
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
-void Level_Draw() {
+void Level_Draw(void* data) {
 	int i, j;
 
 	// Limpar tela do frame anterior
