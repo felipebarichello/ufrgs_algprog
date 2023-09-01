@@ -109,6 +109,8 @@ void Level_Init(Level_Args* args) {
 	soft_reset();
 
 	paused = 0;
+
+	free(args);
 }
 
 // Chamada em cada frame antes de Draw()
