@@ -32,7 +32,7 @@
     [x] Esmeraldas_coletadas / Esmeraldas_totais
     
 [ ] Mapas
-    [ ] Nome dinâmico
+    [x] Nome dinâmico
     [ ] Mínimo 3 mapas
         [x] Mapa 1
         [x] Mapa 2
