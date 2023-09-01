@@ -37,7 +37,7 @@
         [x] Mapa 1
         [x] Mapa 2
         [ ] Mapa 3
-    [ ] Mas é dinâmico para qualquer numero de mapas
+    [x] Mas é dinâmico para qualquer numero de mapas
     [ ] Mínimo 30x20 (dimensões) cada um
     
 [ ] Menu principal
