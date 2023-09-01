@@ -92,7 +92,7 @@ void Level_Init(Level_Args* args) {
 	bullet_speed = BULLET_SPEED / FPS;
 
 	if (args->load_saved_game) {
-		// load_save();
+		load_savestate("data/savestate.sav");
 	} else {
 		new_game();
 	}
@@ -472,12 +472,9 @@ void update_pause(void (*set_scene)(Scene scene)) {
 	}
 	
 	if (IsKeyPressed(KEY_C)) {
-		/*
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 1;
 		set_scene(Level_Scene(), level_args);
-		*/
-		load_savestate("data/savestate.sav");
 		return;
 	}
 
@@ -821,7 +818,7 @@ int check_level_complete() {
 int make_savestate(const char* path) { //Savestates são salvos como arquivos de texto, porque só haverá suporte para um de cada vez 
 	FILE* fptr;
 	int i, j;
-	const int const_neg_um = -1;
+	const int END_OF_ENEMIES = -1;
 
 	if ((fptr = fopen(path, "w")) == NULL) {
 		perror("Erro ao criar arquivo");
@@ -843,9 +840,9 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 		}
 
 		foreach_enemy(&write_enemy_position, fptr);
-		fprintf(fptr, "%d %d", const_neg_um, const_neg_um);
+		fprintf(fptr, "%d\t%d", END_OF_ENEMIES, END_OF_ENEMIES);
 		fprintf(fptr, "\n\n");
-		fprintf(fptr, "%d	%d	%d\n", lives, emeralds_collected, score);
+		fprintf(fptr, "%d\t%d\t%d\n", lives, emeralds_collected, score);
 		fprintf(fptr, "%d", current_level);
 
 
@@ -857,16 +854,24 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 
 //Compatível com foreach_enemy
 void write_enemy_position(PooledEnemy* enemy, FILE* fptr) {
-	fprintf(fptr, "%d	%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
+	fprintf(fptr, "%d\t%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
 }
 
 int load_savestate(const char* path) {
 	FILE* fptr;
 	Vec2 aux_vec2;
 	EnemyPool pool;
+	int i;
+
+	for (i = 0; i < ENEMY_MAX; i++) {
+		pool.pool[i].active = 0;
+	}
+
+	enemy_pool.lower_bound = 0;
+	enemy_pool.upper_bound = 0;
 
 	if ((fptr = fopen(path, "r")) == NULL) {
-		perror("Error in loading savestate");
+		perror("Erro ao abrir savestate");
 		return 0;
 	} else {
 		printf("Sucesso ao abrir savestate");
@@ -874,23 +879,27 @@ int load_savestate(const char* path) {
 		for (int i = 0; i < MAX_LEVEL_HEIGHT; i++) {
 			for (int j = 0; j < MAX_LEVEL_WIDTH; j++) {
 				map[i][j] = fgetc(fptr);
+				printf("%c", map[i][j]);
 			}
 			fgetc(fptr);
+			printf("\n");
 		}
-		fgetc(fptr);
+
 		do {
-			if (_fgetchar(fptr) != '\n') {
-				fscanf(fptr, "%d", &aux_vec2.x);
-				_fgetchar(fptr);
-				fscanf_s(fptr, "%d", &aux_vec2.y);
-				_fgetchar(fptr);
+			aux_vec2.x = fgetc(fptr);
+
+			if (aux_vec2.x != '\n') {
+				fscanf(fptr, "\t%d\n", &aux_vec2.y);
 				spawn_enemy(aux_vec2, &pool);
+				printf("%d\t%d", aux_vec2.x, aux_vec2.y);
 			}
+			printf("lendo contrabarra n");
 		} while (aux_vec2.y != -1);
 		fgetc(fptr);
 		fgetc(fptr);
 		fscanf(fptr, "%d	%d	%d\n", &lives, &emeralds_collected, &score);
 		fscanf(fptr, "%d", &current_level);
+		printf("lido o resto");
 	}
 
 	return 1;
