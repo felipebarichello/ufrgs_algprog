@@ -11,7 +11,7 @@
 
 #include "scene.h"
 #include "game_over_scene.h"
-#include "victory_scene.h"
+
 
 scene(Level)
 
@@ -24,7 +24,7 @@ void new_game();
 void load_save();
 void load_map(const char* file_name);
 void load_sounds();
-void update_level();
+void update_level(void (*set_scene)(Scene scene));
 void update_pause(void (*set_scene)(Scene scene));
 void soft_reset();
 void set_unit_length(int length);
@@ -52,7 +52,7 @@ int unit_length, sight_radius, emeralds_collected;
 char map_name[18];
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
-int level_max_emeralds, max_level, next_level = 1;
+int level_max_emeralds, max_level, current_level = 0, next_level;
 char level_map_path[64];
 
 EnemyPool enemy_pool;
@@ -97,6 +97,8 @@ void Level_Init(Level_Args* args) {
 
 	enemy_touches_player = 0;
 
+	next_level = current_level + 1;
+
 	if (args->load_saved_game) {
 		// load_save();
 	} else {
@@ -117,7 +119,7 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 	}
 
 	if (!paused) {
-		update_level();
+		update_level(set_scene);
 	} else {
 		update_pause(set_scene);
 	}
@@ -208,7 +210,7 @@ void new_game() {
 	lives = 3;
 	score = 0;
 	
-	load_map("resources/maps/001.map");
+	load_map(level_map_path);
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		initial_enemy_pool.pool[i].active = 0;
@@ -319,7 +321,7 @@ void load_sounds() {
 	sounds.kill      = LoadSound("resources/audio/splat.mp3");
 }
 
-void update_level() {
+void update_level(void (*set_scene)(Scene scene)) {
 	Vec2 input_dir = { 0, 0 }, target_position;
 	
 	/* Input de movimento */
@@ -419,31 +421,34 @@ void update_level() {
 
 		enemy_touches_player = 0;
 	}
-	
-	if (check_level_complete()) {
-		Level_Args* level_args;
 
+	if (check_level_complete()) {
+		current_level++;
 		next_level++;
 		strcpy(level_map_path, "resources/maps/");
 		strcpy(map_name, "mapa");
-		sprintf(map_name, "%s%d", map_name, next_level);
+		sprintf(map_name, "%s%d", map_name, current_level);
 		strcat(map_name, ".map");
 		strcat(level_map_path, map_name);
 
-		level_args = malloc(sizeof(Level_Args));
-		level_args->load_saved_game = 0;
-
-		Level_Init(level_args);
+		if (fopen(level_map_path, "r") != NULL) { //Teste para fim de jogo. Se o fopen retornar NULL, é porque não tem mais mapas pra carregar - fim de jogo, o jogador venceu
+			Level_Args* level_args = malloc(sizeof(Level_Args));
+			level_args->load_saved_game = 0;
+			Level_Init(level_args);
+		} else {
+			GameOver_Args* gameover_args = malloc(sizeof(GameOver_Args));
+			gameover_args->ending = VICTORY;
+			gameover_args->score = score;
+			set_scene(GameOver_Scene(), &gameover_args);
+		}
 	}
-
-	/*
-	if (lives == 0) {
-		set_scene(GameOver_Scene(), (int*)score);
+	
+	if (lives <= 0) {
+		GameOver_Args* gameover_args = malloc(sizeof(GameOver_Args));
+		gameover_args->ending = DEFEAT;
+		gameover_args->score = score;
+		set_scene(GameOver_Scene(), &gameover_args);
 	}
-	else if (next_level > max_level) {
-		set_scene(Victory_Scene(), (int*)score);
-	}
-	*/
 }
 
 void update_pause(void (*set_scene)(Scene scene)) {

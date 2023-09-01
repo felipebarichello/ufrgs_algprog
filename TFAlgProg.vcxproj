@@ -158,7 +158,6 @@
     <ClCompile Include="level.c" />
     <ClCompile Include="map_reader.c" />
     <ClCompile Include="menu.c" />
-    <ClCompile Include="victory.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game_over_scene.h" />
@@ -170,7 +169,6 @@
     <ClInclude Include="gamelib.h" />
     <ClInclude Include="level.h" />
     <ClInclude Include="level_lib.h" />
-    <ClInclude Include="victory_scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
