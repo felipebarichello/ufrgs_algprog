@@ -1,4 +1,4 @@
-#include "level.h"
+#include "level_scene.h"
 #include "level_lib.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,11 +9,11 @@
 
 scene(GameOver)
 
-void GameOver_Init() {
+void GameOver_Init(void* _) {
 
 }
 
-void GameOver_Update() {
+void GameOver_Update(void (*set_scene)(Scene scene)) {
 	if (IsKeyPressed(KEY_N)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 0;

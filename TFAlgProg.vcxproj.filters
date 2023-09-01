@@ -20,6 +20,12 @@
     <Filter Include="Source files\Game\Scenes\Menu">
       <UniqueIdentifier>{91fd16b1-06a9-4179-8326-4abaf31bf2b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source files\Game\Scenes\Victory">
+      <UniqueIdentifier>{3cecb0fb-251a-4878-a532-7e8127377443}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source files\Game\Scenes\Game Over">
+      <UniqueIdentifier>{33ba3b1e-54f4-413b-aad7-eefd025aa09a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="level.c">
@@ -46,6 +52,12 @@
     <ClCompile Include="map_reader.c">
       <Filter>Source files\Game</Filter>
     </ClCompile>
+    <ClCompile Include="game_over.c">
+      <Filter>Source files\Game\Scenes\Game Over</Filter>
+    </ClCompile>
+    <ClCompile Include="victory.c">
+      <Filter>Source files\Game\Scenes\Victory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="level.h">
@@ -71,6 +83,12 @@
     </ClInclude>
     <ClInclude Include="map_reader.h">
       <Filter>Source files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="game_over_scene.h">
+      <Filter>Source files\Game\Scenes\Game Over</Filter>
+    </ClInclude>
+    <ClInclude Include="victory_scene.h">
+      <Filter>Source files\Game\Scenes\Victory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
