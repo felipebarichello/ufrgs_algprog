@@ -6,7 +6,7 @@
 
 [ ] 3 vidas
     [x] Perder vida = reset inimigos vivos e jogador; apenas
-    [ ] Game over
+    [x] Game over
 
 [x] Pontos
     [x] Esmeralda - 100
