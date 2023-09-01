@@ -45,25 +45,27 @@ void GameOver_Draw() {
 	char print_score[32];
 
 	
-	if (ending == VICTORY) {
-		ClearBackground(RAYWHITE);
-		DrawText("Vitoria", 200, 100, 3 * FONT_SIZE, GREEN);
-		strcpy(print_score, "Score: ");
-		sprintf(print_score, "%s%d", print_score, score);
-		DrawText(print_score, 300, 200, .5 * FONT_SIZE, GRAY);
-		DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, BLACK);
-		DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
-		DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
+	switch (ending) {
+		case VICTORY:
+			ClearBackground(WHITE);
+			DrawText("Vitória!", 300, 100, 3 * FONT_SIZE, GREEN);
+			strcpy(print_score, "Score: ");
+			sprintf(print_score, "%s%d", print_score, score);
+			DrawText(print_score, 300, 200, FONT_SIZE, GRAY);
+			DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, BLACK);
+			DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
+			DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
+		break;
+
+		case DEFEAT:
+			ClearBackground(BLACK);
+			DrawText("Derrota!", 300, 100, 3 * FONT_SIZE, RED);
+			strcpy(print_score, "Score: ");
+			sprintf(print_score, "%s%d", print_score, score);
+			DrawText(print_score, 300, 200, FONT_SIZE, BLUE);
+			DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, RAYWHITE);
+			DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, RAYWHITE);
+			DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, RAYWHITE);
+		break;
 	}
-	else {
-		ClearBackground(BLACK);
-		DrawText("Game Over", 200, 100, 3 * FONT_SIZE, RED);
-		strcpy(print_score, "Score: ");
-		sprintf(print_score, "%s%d", print_score, score);
-		DrawText(print_score, 300, 200, .5 * FONT_SIZE, BLUE);
-		DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, RAYWHITE);
-		DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, RAYWHITE);
-		DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, RAYWHITE);
-	}
-	
 }

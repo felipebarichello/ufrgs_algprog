@@ -440,6 +440,7 @@ void update_level(void (*set_scene)(Scene scene)) {
 			gameover_args->ending = VICTORY;
 			gameover_args->score = score;
 			set_scene(GameOver_Scene(), gameover_args);
+			return;
 		}
 	}
 	
@@ -448,6 +449,7 @@ void update_level(void (*set_scene)(Scene scene)) {
 		gameover_args->ending = DEFEAT;
 		gameover_args->score = score;
 		set_scene(GameOver_Scene(), gameover_args);
+		return;
 	}
 }
 
