@@ -110,7 +110,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -156,12 +156,10 @@
     <ClCompile Include="level_consts.h" />
     <ClCompile Include="main.c" />
     <ClCompile Include="level.c" />
-    <ClCompile Include="map_reader.c" />
     <ClCompile Include="menu.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game_over_scene.h" />
-    <ClInclude Include="map_reader.h" />
     <ClInclude Include="menu_scene.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="start_engine.h" />
