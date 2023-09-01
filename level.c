@@ -421,6 +421,8 @@ void update_level() {
 	}
 	
 	if (check_level_complete()) {
+		Level_Args* level_args;
+
 		next_level++;
 		strcpy(level_map_path, "resources/maps/");
 		strcpy(map_name, "mapa");
@@ -428,7 +430,10 @@ void update_level() {
 		strcat(map_name, ".map");
 		strcat(level_map_path, map_name);
 
-		Level_Init(&((Level_Args){0}));
+		level_args = malloc(sizeof(Level_Args));
+		level_args->load_saved_game = 0;
+
+		Level_Init(level_args);
 	}
 
 	/*
