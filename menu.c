@@ -1,6 +1,6 @@
-#include "menu.h"
+#include "menu_scene.h"
 
-#include "level.h"
+#include "level_scene.h"
 #include "level_lib.h"
 #include <stdio.h>
 #include <stdlib.h>

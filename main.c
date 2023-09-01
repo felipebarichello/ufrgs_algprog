@@ -3,7 +3,7 @@
 */
 
 #include "start_engine.h"
-#include "menu.h"
+#include "menu_scene.h"
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
