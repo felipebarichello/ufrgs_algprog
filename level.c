@@ -230,13 +230,14 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 		Level_Init(&((Level_Args){0}));
 	}
 
-
+	/*
 	if (lives == 0) {
 		set_scene(GameOver_Scene(), (int*)score);
 	}
 	else if (next_level > max_level) {
 		set_scene(Victory_Scene(), (int*)score);
 	}
+	*/
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
