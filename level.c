@@ -861,7 +861,6 @@ void write_enemy_position(PooledEnemy* enemy, FILE* fptr) {
 
 int load_savestate(const char* path) {
 	FILE* fptr;
-	FILE* buff;
 	Vec2 aux_vec2;
 	EnemyPool pool;
 
