@@ -53,7 +53,7 @@ int unit_length, sight_radius, emeralds_collected;
 char map_name[18];
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
-int level_max_emeralds, max_level, next_level = 1;
+int level_max_emeralds, max_level, current_level = 0, next_level;
 char level_map_path[64];
 
 EnemyPool enemy_pool;
@@ -95,6 +95,8 @@ void Level_Init(Level_Args* args) {
 	level_max_emeralds = 0;
 
 	enemy_touches_player = 0;
+
+	next_level = current_level + 1;
 
 	if (args->load_saved_game) {
 		// load_save();
@@ -220,24 +222,32 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 
 	
 	if (check_level_complete()) {
+		current_level++;
 		next_level++;
 		strcpy(level_map_path, "resources/maps/");
 		strcpy(map_name, "mapa");
-		sprintf(map_name, "%s%d", map_name, next_level);
+		sprintf(map_name, "%s%d", map_name, current_level);
 		strcat(map_name, ".map");
 		strcat(level_map_path, map_name);
-
-		Level_Init(&((Level_Args){0}));
+		if (fopen(level_map_path, "r") != NULL) {//Teste para fim de jogo. Se o fopen retornar NULL, é porque não tem mais mapas pra carregar - fim de jogo, o jogador venceu
+			Level_Init(&((Level_Args) { 0 }));
+		} else {
+			GameOver_Args* gameover_args = malloc(sizeof(GameOver_Args));
+			gameover_args->ending = VICTORY;
+			gameover_args->score = score;
+			set_scene(GameOver_Scene(), &gameover_args);
+		}
 	}
 
-	/*
+	
 	if (lives == 0) {
-		set_scene(GameOver_Scene(), (int*)score);
+		GameOver_Args* gameover_args = malloc(sizeof(GameOver_Args));
+		gameover_args->ending = DEFEAT;
+		gameover_args->score = score;
+		set_scene(GameOver_Scene(), &gameover_args);
 	}
-	else if (next_level > max_level) {
-		set_scene(Victory_Scene(), (int*)score);
-	}
-	*/
+
+
 }
 
 // Chamada entre BeginDrawing() e EndDrawing() em cada frame
@@ -316,7 +326,7 @@ void new_game() {
 	lives = 3;
 	score = 0;
 	
-	load_map("resources/maps/001.map");
+	load_map(level_map_path);
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		initial_enemy_pool.pool[i].active = 0;
