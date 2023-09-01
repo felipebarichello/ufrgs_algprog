@@ -22,7 +22,8 @@ typedef struct {
 
 void new_game();
 void load_save();
-void load_map(const char* file_name);
+int load_level();
+int load_map(const char* file_name);
 void load_sounds();
 void update_level(void (*set_scene)(Scene scene));
 void update_pause(void (*set_scene)(Scene scene));
@@ -89,13 +90,7 @@ void Level_Init(Level_Args* args) {
 	
 	load_sounds();
 
-	sight_radius = BASE_SIGHT_RADIUS;
 	bullet_speed = BULLET_SPEED / FPS;
-
-	emeralds_collected = 0;
-	level_max_emeralds = 0;
-
-	enemy_touches_player = 0;
 
 	next_level = current_level + 1;
 
@@ -105,7 +100,7 @@ void Level_Init(Level_Args* args) {
 		new_game();
 	}
 
-	soft_reset();
+	load_level();
 
 	paused = 0;
 
@@ -203,14 +198,25 @@ void Level_Draw() {
 }
 
 void new_game() {
+	lives = 3;
+	score = 0;
+}
+
+// Carregar o nível de caminho `level_map_path`
+// Retorna 1 se foi carregado com sucesso, 0 caso contrário
+int load_level() {
 	int i, j;
+	int has_opened;
+
+	has_opened = load_map(level_map_path);
+
+	if (!has_opened) {
+		return false;
+	}
 
 	emeralds_collected = 0;
 	level_max_emeralds = 0;
-	lives = 3;
-	score = 0;
-	
-	load_map(level_map_path);
+	enemy_touches_player = 0;
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		initial_enemy_pool.pool[i].active = 0;
@@ -239,10 +245,15 @@ void new_game() {
 			}
 		}
 	}
+
+	soft_reset();
+
+	return true;
 }
 
-void load_map(const char* file_name) { 
-
+// Carregar o arquivo de mapa `file_name`
+// Retorna 1 se foi carregado com sucesso, 0 caso contrário
+int load_map(const char* file_name) { 
 	FILE* file;
 
 	// `fopen()` dava erro no VS pois é considerado deprecado.
@@ -253,6 +264,7 @@ void load_map(const char* file_name) {
 	if (fopen_s(&file, file_name, "rb") != 0) {
 		// Deu erro. Não abriu.
 		perror("ERRO: Falha ao carregar mapa\n");
+		return 0;
 	} else {
 		int i, j, line_start = 0;
 		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
@@ -302,6 +314,8 @@ void load_map(const char* file_name) {
 		level_offset.x = (GetScreenWidth()  - level_size.x * unit_length) / 2;
 		level_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
 	}
+
+	return 1;
 }
 
 void load_sounds() {
@@ -392,8 +406,7 @@ void update_level(void (*set_scene)(Scene scene)) {
 		// Testar colisão com inimigos
 		foreach_enemy(&is_enemy_at, &args);
 
-		if (args.is_any_enemy_at)
-		{
+		if (args.is_any_enemy_at) {
 			enemy_touches_player = 1;
 		}
 	}
@@ -418,24 +431,25 @@ void update_level(void (*set_scene)(Scene scene)) {
 		#if (!DEBUG_PLAYER_INVINCIBILITY)
 			player_enemy_collision();
 		#endif
-
-		enemy_touches_player = 0;
 	}
 
 	if (check_level_complete()) {
+		FILE* file;
+		int file_exists;
+
 		current_level++;
 		next_level++;
+
 		strcpy(level_map_path, "resources/maps/");
 		strcpy(map_name, "mapa");
 		sprintf(map_name, "%s%d", map_name, current_level);
 		strcat(map_name, ".map");
 		strcat(level_map_path, map_name);
 
-		if (fopen(level_map_path, "r") != NULL) { //Teste para fim de jogo. Se o fopen retornar NULL, é porque não tem mais mapas pra carregar - fim de jogo, o jogador venceu
-			Level_Args* level_args = malloc(sizeof(Level_Args));
-			level_args->load_saved_game = 0;
-			Level_Init(level_args);
-		} else {
+		file_exists = load_level();
+
+		// Teste para fim de jogo. Se `load_level` retornar 0, é porque não tem mais mapas pra carregar - fim de jogo, o jogador venceu
+		if (!file_exists) {
 			GameOver_Args* gameover_args = malloc(sizeof(GameOver_Args));
 			gameover_args->ending = VICTORY;
 			gameover_args->score = score;
@@ -487,10 +501,12 @@ void update_pause(void (*set_scene)(Scene scene)) {
 void soft_reset() {
 	// Resetar o jogador
 	player_position = initial_player_position;
+	sight_radius = BASE_SIGHT_RADIUS;
 	powerup_timer = 0;
 
 	// Resetar os inimigos
 	memcpy(&enemy_pool, &initial_enemy_pool, sizeof(EnemyPool));
+	enemy_touches_player = 0;
 
 	// Resetar a bala
 	bullet.lifetime = 0;
