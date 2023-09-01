@@ -78,7 +78,7 @@
     <ClInclude Include="gamelib.h">
       <Filter>Source files\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="menu.h">
+    <ClInclude Include="menu_scene.h">
       <Filter>Source files\Game\Scenes\Menu</Filter>
     </ClInclude>
     <ClInclude Include="map_reader.h">

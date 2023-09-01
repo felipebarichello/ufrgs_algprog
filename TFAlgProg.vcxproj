@@ -163,7 +163,7 @@
   <ItemGroup>
     <ClInclude Include="game_over_scene.h" />
     <ClInclude Include="map_reader.h" />
-    <ClInclude Include="menu.h" />
+    <ClInclude Include="menu_scene.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="start_engine.h" />
     <ClInclude Include="engine.h" />
