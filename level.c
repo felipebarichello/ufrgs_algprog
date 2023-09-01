@@ -11,7 +11,7 @@
 
 #include "scene.h"
 #include "game_over_scene.h"
-#include "victory_scene.h"
+
 
 scene(Level)
 
@@ -229,6 +229,7 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 		sprintf(map_name, "%s%d", map_name, current_level);
 		strcat(map_name, ".map");
 		strcat(level_map_path, map_name);
+
 		if (fopen(level_map_path, "r") != NULL) {//Teste para fim de jogo. Se o fopen retornar NULL, é porque não tem mais mapas pra carregar - fim de jogo, o jogador venceu
 			Level_Init(&((Level_Args) { 0 }));
 		} else {
@@ -236,9 +237,9 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 			gameover_args->ending = VICTORY;
 			gameover_args->score = score;
 			set_scene(GameOver_Scene(), &gameover_args);
+			
 		}
 	}
-
 	
 	if (lives == 0) {
 		GameOver_Args* gameover_args = malloc(sizeof(GameOver_Args));
@@ -246,7 +247,7 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 		gameover_args->score = score;
 		set_scene(GameOver_Scene(), &gameover_args);
 	}
-
+	
 
 }
 

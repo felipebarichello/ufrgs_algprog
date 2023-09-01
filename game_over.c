@@ -8,13 +8,16 @@
 #include "scene.h"
 #include "level_consts.h"
 
-scene(Victory)
+scene(GameOver)
+
+int score;
+Ending ending;
 
 void GameOver_Init(GameOver_Args* args) {
 	ending = args->ending;
 	score = args->score;
 
-	free(args);
+	//free(args);
 }
 
 void GameOver_Update(void (*set_scene)(Scene scene)) {
@@ -38,12 +41,26 @@ void GameOver_Update(void (*set_scene)(Scene scene)) {
 void GameOver_Draw() {
 	char print_score[32];
 
-	ClearBackground(RAYWHITE);
-	DrawText("Vitoria", 200, 100, 3 * FONT_SIZE, GREEN);
-	strcpy(print_score, "Score: ");
-	sprintf(print_score, "%s%d", print_score, score);
-	DrawText(print_score, 300, 200, .5 * FONT_SIZE, GRAY);
-	DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, BLACK);
-	DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
-	DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
+	
+	if (ending == VICTORY) {
+		ClearBackground(RAYWHITE);
+		DrawText("Vitoria", 200, 100, 3 * FONT_SIZE, GREEN);
+		strcpy(print_score, "Score: ");
+		sprintf(print_score, "%s%d", print_score, score);
+		DrawText(print_score, 300, 200, .5 * FONT_SIZE, GRAY);
+		DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, BLACK);
+		DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
+		DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
+	}
+	else {
+		ClearBackground(BLACK);
+		DrawText("Game Over", 200, 100, 3 * FONT_SIZE, RED);
+		strcpy(print_score, "Score: ");
+		sprintf(print_score, "%s%d", print_score, score);
+		DrawText(print_score, 300, 200, .5 * FONT_SIZE, BLUE);
+		DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, RAYWHITE);
+		DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, RAYWHITE);
+		DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, RAYWHITE);
+	}
+	
 }
