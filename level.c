@@ -336,6 +336,7 @@ void load_sounds() {
 	sounds.kill      = LoadSound("resources/audio/splat.mp3");
 }
 
+// Decrementa timers, verifica input, atualiza estados e verifica colisões, entre outras coisas
 void update_level(void (*set_scene)(Scene scene)) {
 	Vec2 input_dir = { 0, 0 }, target_position;
 	
