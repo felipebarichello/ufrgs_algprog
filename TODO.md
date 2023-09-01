@@ -4,7 +4,7 @@
 	
 [x] Fog of war (9x9)
 
-[ ] 3 vidas
+[ ] Vidas (3)
     [x] Perder vida = reset inimigos vivos e jogador; apenas
     [x] Game over
 
@@ -61,10 +61,10 @@ jogar.
 para o jogo, que continua do ponto em que parou quando o usuário acessou o menu.
 
 [ ] Game over
-    [ ] Casos
-        [ ] Win
-        [ ] Lose
-    [ ] Mostrar pontos
+    [x] Casos
+        [x] Win
+        [x] Lose
+    [x] Mostrar pontos
 
 ---
 
