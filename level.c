@@ -461,6 +461,7 @@ void update_level(void (*set_scene)(Scene scene)) {
 	}
 }
 
+// Atualizar menu de pausa
 void update_pause(void (*set_scene)(Scene scene)) {
 	if (IsKeyPressed(KEY_N)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
