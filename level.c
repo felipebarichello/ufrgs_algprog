@@ -181,7 +181,7 @@ void Level_Draw() {
 
 	DrawText(TextFormat("Vidas: %02i", lives), 30, 2 + level_offset.y, FONT_SIZE, COLOR_LIVES_TEXT);
 	DrawText(TextFormat("Esmeraldas: %02i / %02i", emeralds_collected, level_max_emeralds), 150, 2 + level_offset.y, FONT_SIZE, COLOR_EMERALD_TEXT);
-	DrawText(TextFormat("Nível: %03i", 1), 400, 2 + level_offset.y, FONT_SIZE, COLOR_LEVEL_TEXT);
+	DrawText(TextFormat("Nível: %03i", current_level), 400, 2 + level_offset.y, FONT_SIZE, COLOR_LEVEL_TEXT);
 	DrawText(TextFormat("Pontuação: %06i", score), 550, 2 + level_offset.y, FONT_SIZE, COLOR_SCORE_TEXT);
 
 
