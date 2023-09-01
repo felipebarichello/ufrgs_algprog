@@ -25,10 +25,10 @@
     [x] Power up
         [x] Visibilidade mapa inteiro (3s)
         
-[ ] HUD
+[x] HUD
     [x] Vidas
     [x] Pontuacao
-    [ ] Nivel
+    [x] Nivel
     [x] Esmeraldas_coletadas / Esmeraldas_totais
     
 [ ] Mapas
