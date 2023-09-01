@@ -31,14 +31,14 @@
     [x] Nivel
     [x] Esmeraldas_coletadas / Esmeraldas_totais
     
-[ ] Mapas
+[x] Mapas
     [x] Nome dinâmico
-    [ ] Mínimo 3 mapas
+    [x] Mínimo 3 mapas
         [x] Mapa 1
         [x] Mapa 2
-        [ ] Mapa 3
+        [x] Mapa 3
     [x] Mas é dinâmico para qualquer numero de mapas
-    [ ] Mínimo 30x20 (dimensões) cada um
+    [x] Mínimo 30x20 (dimensões) cada um
     
 [x] Menu principal
     [x] (N) Novo jogo
