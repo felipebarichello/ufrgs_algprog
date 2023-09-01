@@ -24,6 +24,8 @@ void new_game();
 void load_save();
 void load_map(const char* file_name);
 void load_sounds();
+void update_level();
+void update_pause();
 void soft_reset();
 void set_unit_length(int length);
 char is_in_bounds(Vec2 position);
@@ -78,6 +80,8 @@ LevelSounds sounds;
 
 Vec2 text_box;
 
+char paused;
+
 
 // Chamada quando o jogo deve inicializar
 void Level_Init(Level_Args* args) {
@@ -103,12 +107,225 @@ void Level_Init(Level_Args* args) {
 	}
 
 	soft_reset();
+
+	paused = 0;
 }
 
 // Chamada em cada frame antes de Draw()
 void Level_Update(void (*set_scene)(Scene scene)) {
-	Vec2 input_dir = { 0, 0 }, target_position;
+	if (IsKeyPressed(KEY_TAB)) {
+		paused = !paused;
+	}
 
+	if (!paused) {
+		update_level();
+	} else {
+		update_pause();
+	}
+}
+
+// Chamada entre BeginDrawing() e EndDrawing() em cada frame
+void Level_Draw() {
+	int i, j;
+
+	// Limpar tela do frame anterior
+	ClearBackground(BLACK);
+
+	// Desenhar os tiles
+	for (i = 0; i < level_size.y; i++) {
+		Vec2 pos;
+
+		pos.y = i;
+
+		for (j = 0; j < level_size.x; j++) {
+			pos.x = j;
+
+			switch (map[i][j]) {
+				case T_WALL:
+					draw_tile(pos, COLOR_WALL);
+					break;
+
+				case T_BURIED:
+					draw_tile(pos, COLOR_BURIED);
+					break;
+
+				case T_EMERALD:
+					draw_tile(pos, COLOR_EMERALD);
+					break;
+
+				case T_GOLD:
+					draw_tile(pos, COLOR_GOLD);
+					break;
+
+				case T_POWERUP:
+					draw_tile(pos, COLOR_POWERUP);
+					break;
+
+				// Vazio
+				default:
+					draw_tile(pos, COLOR_EMPTY);
+			}
+		}
+	}
+
+	// Desenhar os inimigos
+	foreach_enemy(&draw_enemy, NULL);
+
+	// Desenhar o jogador
+	draw_tile(player_position, COLOR_PLAYER);
+
+	// Desenhar tiro (se estiver ativo)
+	if (bullet.lifetime > 0) {
+		BeginRotation(bullet.position, Vector2Angle(bullet.velocity) * RAD2DEG);
+			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
+		EndRotation();
+	}
+	/*Imprimir informações de vidas, score e esmeraldas*/
+
+	text_box.x = 0;
+	print_lives(text_box);
+
+	text_box.x += 260;
+	print_emeralds(text_box);
+
+	text_box.x += 260;
+	print_score(text_box);
+
+
+	// Se estiver pausado, escurecer o fundo e desenhar o menu de pausa
+	if (paused) {
+		DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), (Color){0, 0, 0, 200});
+		DrawText("PAUSED", GetScreenWidth() / 2 - 200, GetScreenHeight() / 2 - 200, 100, WHITE);
+		DrawText("(N): Novo Jogo",     250, 250, 24, WHITE);
+		DrawText("(C): Carregar Jogo", 250, 300, 24, WHITE);
+		DrawText("(C): Salvar Jogo",   250, 350, 24, WHITE);
+		DrawText("(Q): Sair do Jogo",  250, 400, 24, WHITE);
+		DrawText("(V): Voltar",        250, 450, 24, WHITE);
+	}
+}
+
+void new_game() {
+	int i, j;
+
+	emeralds_collected = 0;
+	level_max_emeralds = 0;
+	lives = 3;
+	score = 0;
+	
+	load_map("resources/maps/001.map");
+
+	for (i = 0; i < ENEMY_MAX; i++) {
+		initial_enemy_pool.pool[i].active = 0;
+	}
+
+	initial_enemy_pool.lower_bound = 0;
+	initial_enemy_pool.upper_bound = 0;
+	
+	// Spawnar entidades e contar esmeraldas baseado no mapa
+	for (i = 0; i < level_size.y; i++) {
+		for (j = 0; j < level_size.x; j++) {
+			Vec2 matrix_position = {j, i};
+
+			switch (map[i][j]) {
+				case T_PLAYER:
+					player_position = initial_player_position = matrix_position;
+					break;
+
+				case T_ENEMY:
+					spawn_enemy(matrix_position, &initial_enemy_pool);
+					break;
+
+				case T_EMERALD:
+					level_max_emeralds++;
+					break;
+			}
+		}
+	}
+}
+
+void load_map(const char* file_name) { 
+
+	FILE* file;
+
+	// `fopen()` dava erro no VS pois é considerado deprecado.
+	// Sei que parece gambiarra, mas `fopen_s()` é a opção mais segura
+	// E também sei que parece errado o `&file`, sendo file já um `FILE*`
+	// Mas sim, `fopen_s()` requer um FILE** como primeiro parâmetro
+	// https://learn.microsoft.com/pt-br/cpp/c-runtime-library/reference/fopen-s-wfopen-s?view=msvc-170
+	if (fopen_s(&file, file_name, "rb") != 0) {
+		// Deu erro. Não abriu.
+		perror("ERRO: Falha ao carregar mapa\n");
+	} else {
+		int i, j, line_start = 0;
+		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
+		size_t bytes_read;
+		Vec2 min_unit_length;
+
+		// Deu certo. Abriu.
+
+		// Ler todo o mapa que o arquivo continha (com um máximo)
+		// 1 é somado a MAX_LEVEL_WIDTH porque o \n é um caractere que não é um elemento
+		bytes_read = fread(&map_buffer, sizeof(char), (MAX_LEVEL_WIDTH + 1) * MAX_LEVEL_HEIGHT, file);
+		fclose(file);
+
+		// Valor temporário
+		level_size.x = 0;
+
+		// Interpretar cada linha (até \n)
+		for (i = 0; line_start < bytes_read; i++) {
+			for (j = 0; map_buffer[line_start + j] != '\n' && line_start + j <= bytes_read; j++) {
+				map[i][j] = map_buffer[line_start + j];
+			}
+
+			// A largura do nível é setada várias vezes até a maior ser encontrada
+			if (j > level_size.x) {
+				level_size.x = j - 1;
+			}
+
+			line_start += j + 1;
+		}
+
+		level_size.y = i;
+
+		/* Definir o comprimento unitário e o offset da tela */
+
+		min_unit_length.x = GetScreenWidth()  / level_size.x; // Variável auxiliar. Mínimo para a largura ser satisfeita
+		min_unit_length.y = GetScreenHeight() / level_size.y; // Mínimo para a altura ser satisfeita
+
+		// O comprimento unitário é a menor largura de aresta de um tile que permite que o nível inteiro seja desenhado na tela
+		if (min_unit_length.y > min_unit_length.x) {
+			// O comprimento unitário se torna o menor entre os dois mínimos
+			set_unit_length(min_unit_length.x);
+		} else {
+			set_unit_length(min_unit_length.y);
+		}
+
+		// O offset serve para centralizar o jogo na tela, deixando bordas pretas quando necessário
+		level_offset.x = (GetScreenWidth()  - level_size.x * unit_length) / 2;
+		level_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
+	}
+}
+
+void load_sounds() {
+	sounds.combo[0]  = LoadSound("resources/audio/firstblood.wav");
+	sounds.combo[1]  = LoadSound("resources/audio/headshot.wav");
+	sounds.combo[2]  = LoadSound("resources/audio/doublekill.wav");
+	sounds.combo[3]  = LoadSound("resources/audio/triplekill.wav");
+	sounds.combo[4]  = LoadSound("resources/audio/multikill.wav");
+	sounds.combo[5]  = LoadSound("resources/audio/killingspree.wav");
+	sounds.combo[6]  = LoadSound("resources/audio/rampage.wav");
+	sounds.combo[7]  = LoadSound("resources/audio/dominating.wav");
+	sounds.combo[8]  = LoadSound("resources/audio/ultrakill.wav");
+	sounds.combo[9]  = LoadSound("resources/audio/godlike.wav");
+	sounds.combo[10] = LoadSound("resources/audio/monsterkill.wav");
+	sounds.gunshot   = LoadSound("resources/audio/gunshot.mp3");
+	sounds.empty_gun = LoadSound("resources/audio/emptygun.wav");
+	sounds.kill      = LoadSound("resources/audio/splat.mp3");
+}
+
+void update_level() {
+	Vec2 input_dir = { 0, 0 }, target_position;
+	
 	/* Input de movimento */
 
 	if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W))
@@ -240,191 +457,8 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 	*/
 }
 
-// Chamada entre BeginDrawing() e EndDrawing() em cada frame
-void Level_Draw() {
-	int i, j;
+void update_pause() {
 
-	// Limpar tela do frame anterior
-	ClearBackground(BLACK);
-
-	// Desenhar os tiles
-	for (i = 0; i < level_size.y; i++) {
-		Vec2 pos;
-
-		pos.y = i;
-
-		for (j = 0; j < level_size.x; j++) {
-			pos.x = j;
-
-			switch (map[i][j]) {
-				case T_WALL:
-					draw_tile(pos, COLOR_WALL);
-					break;
-
-				case T_BURIED:
-					draw_tile(pos, COLOR_BURIED);
-					break;
-
-				case T_EMERALD:
-					draw_tile(pos, COLOR_EMERALD);
-					break;
-
-				case T_GOLD:
-					draw_tile(pos, COLOR_GOLD);
-					break;
-
-				case T_POWERUP:
-					draw_tile(pos, COLOR_POWERUP);
-					break;
-
-				// Vazio
-				default:
-					draw_tile(pos, COLOR_EMPTY);
-			}
-		}
-	}
-
-	// Desenhar os inimigos
-	foreach_enemy(&draw_enemy, NULL);
-
-	// Desenhar o jogador
-	draw_tile(player_position, COLOR_PLAYER);
-
-	// Desenhar tiro (se estiver ativo)
-	if (bullet.lifetime > 0) {
-		BeginRotation(bullet.position, Vector2Angle(bullet.velocity) * RAD2DEG);
-			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
-		EndRotation();
-	}
-	/*Imprimir informações de vidas, score e esmeraldas*/
-
-	text_box.x = 0;
-	print_lives(text_box);
-
-	text_box.x += 260;
-	print_emeralds(text_box);
-
-	text_box.x += 260;
-	print_score(text_box);
-}
-
-void new_game() {
-	int i, j;
-
-	emeralds_collected = 0;
-	level_max_emeralds = 0;
-	lives = 3;
-	score = 0;
-	
-	load_map("resources/maps/001.map");
-
-	for (i = 0; i < ENEMY_MAX; i++) {
-		initial_enemy_pool.pool[i].active = 0;
-	}
-
-	initial_enemy_pool.lower_bound = 0;
-	initial_enemy_pool.upper_bound = 0;
-	
-	// Spawnar entidades e contar esmeraldas baseado no mapa
-	for (i = 0; i < level_size.y; i++) {
-		for (j = 0; j < level_size.x; j++) {
-			Vec2 matrix_position = {j, i};
-
-			switch (map[i][j]) {
-				case T_PLAYER:
-					player_position = initial_player_position = matrix_position;
-					break;
-
-				case T_ENEMY:
-					spawn_enemy(matrix_position, &initial_enemy_pool);
-					break;
-
-				case T_EMERALD:
-					level_max_emeralds++;
-					break;
-			}
-		}
-	}
-}
-
-void load_map(const char* file_name) { 
-
-	FILE* file;
-
-	// `fopen()` dava erro no VS pois é considerado deprecado.
-	// Sei que parece gambiarra, mas `fopen_s()` é a opção mais segura
-	// E também sei que parece errado o `&file`, sendo file já um `FILE*`
-	// Mas sim, `fopen_s()` requer um FILE** como primeiro parâmetro
-	// https://learn.microsoft.com/pt-br/cpp/c-runtime-library/reference/fopen-s-wfopen-s?view=msvc-170
-	if (fopen_s(&file, file_name, "rb") != 0) {
-		// Deu erro. Não abriu.
-		perror("ERRO: Falha ao carregar mapa\n");
-	} else {
-		int i, j, line_start = 0;
-		char map_buffer[MAX_LEVEL_WIDTH * MAX_LEVEL_HEIGHT] = {0};
-		size_t bytes_read;
-		Vec2 min_unit_length;
-
-		// Deu certo. Abriu.
-
-		// Ler todo o mapa que o arquivo continha (com um máximo)
-		// 1 é somado a MAX_LEVEL_WIDTH porque o \n é um caractere que não é um elemento
-		bytes_read = fread(&map_buffer, sizeof(char), (MAX_LEVEL_WIDTH + 1) * MAX_LEVEL_HEIGHT, file);
-		fclose(file);
-
-		// Valor temporário
-		level_size.x = 0;
-
-		// Interpretar cada linha (até \n)
-		for (i = 0; line_start < bytes_read; i++) {
-			for (j = 0; map_buffer[line_start + j] != '\n' && line_start + j <= bytes_read; j++) {
-				map[i][j] = map_buffer[line_start + j];
-			}
-
-			// A largura do nível é setada várias vezes até a maior ser encontrada
-			if (j > level_size.x) {
-				level_size.x = j - 1;
-			}
-
-			line_start += j + 1;
-		}
-
-		level_size.y = i;
-
-		/* Definir o comprimento unitário e o offset da tela */
-
-		min_unit_length.x = GetScreenWidth()  / level_size.x; // Variável auxiliar. Mínimo para a largura ser satisfeita
-		min_unit_length.y = GetScreenHeight() / level_size.y; // Mínimo para a altura ser satisfeita
-
-		// O comprimento unitário é a menor largura de aresta de um tile que permite que o nível inteiro seja desenhado na tela
-		if (min_unit_length.y > min_unit_length.x) {
-			// O comprimento unitário se torna o menor entre os dois mínimos
-			set_unit_length(min_unit_length.x);
-		} else {
-			set_unit_length(min_unit_length.y);
-		}
-
-		// O offset serve para centralizar o jogo na tela, deixando bordas pretas quando necessário
-		level_offset.x = (GetScreenWidth()  - level_size.x * unit_length) / 2;
-		level_offset.y = (GetScreenHeight() - level_size.y * unit_length) / 2;
-	}
-}
-
-void load_sounds() {
-	sounds.combo[0]  = LoadSound("resources/audio/firstblood.wav");
-	sounds.combo[1]  = LoadSound("resources/audio/headshot.wav");
-	sounds.combo[2]  = LoadSound("resources/audio/doublekill.wav");
-	sounds.combo[3]  = LoadSound("resources/audio/triplekill.wav");
-	sounds.combo[4]  = LoadSound("resources/audio/multikill.wav");
-	sounds.combo[5]  = LoadSound("resources/audio/killingspree.wav");
-	sounds.combo[6]  = LoadSound("resources/audio/rampage.wav");
-	sounds.combo[7]  = LoadSound("resources/audio/dominating.wav");
-	sounds.combo[8]  = LoadSound("resources/audio/ultrakill.wav");
-	sounds.combo[9]  = LoadSound("resources/audio/godlike.wav");
-	sounds.combo[10] = LoadSound("resources/audio/monsterkill.wav");
-	sounds.gunshot   = LoadSound("resources/audio/gunshot.mp3");
-	sounds.empty_gun = LoadSound("resources/audio/emptygun.wav");
-	sounds.kill      = LoadSound("resources/audio/splat.mp3");
 }
 
 // Reseta parcialmente o nível
