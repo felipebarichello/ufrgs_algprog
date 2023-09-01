@@ -20,7 +20,7 @@ void GameOver_Init(GameOver_Args* args) {
 	free(args);
 }
 
-void GameOver_Update(void (*set_scene)(Scene scene)) {
+void GameOver_Update(void (*set_scene)(Scene scene), void (*stop_engine)()) {
 	if (IsKeyPressed(KEY_N)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 0;
@@ -36,7 +36,7 @@ void GameOver_Update(void (*set_scene)(Scene scene)) {
 	}
 
 	if (IsKeyPressed(KEY_Q)) {
-		CloseWindow();
+		(*stop_engine)();
 		return;
 	}
 }

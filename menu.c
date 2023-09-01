@@ -16,7 +16,7 @@ void Menu_Init() {
 	SetTargetFPS(FPS);
 }
 
-void Menu_Update(void (*set_scene)(Scene scene)) {
+void Menu_Update(void (*set_scene)(Scene scene), void (*stop_engine)()) {
 	if (IsKeyPressed(KEY_N)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 0;
@@ -32,15 +32,16 @@ void Menu_Update(void (*set_scene)(Scene scene)) {
 	}
 
 	if (IsKeyPressed(KEY_Q)) {
-		CloseWindow();
+		(*stop_engine)();
 		return;
 	}
 }
 
 void Menu_Draw(void* _) {
 	ClearBackground(RAYWHITE);
-	DrawText("Over Engineered Pac Mine", 175, 100, 4 * FONT_SIZE, RED);
-	DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, BLACK);
-	DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
-	DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
+	DrawText("Overengineered", 175, 100, 3 * FONT_SIZE, RED);
+	DrawText("Pac-Mine", 200, 140, 5 * FONT_SIZE, DARKBLUE);
+	DrawText("(N): Novo Jogo", 270, 250, 1.2 * FONT_SIZE, BLACK);
+	DrawText("(C): Carregar Jogo", 270, 280, 1.2 * FONT_SIZE, BLACK);
+	DrawText("(Q): Sair do Jogo", 270, 310, 1.2 * FONT_SIZE, BLACK);
 }

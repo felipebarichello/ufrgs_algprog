@@ -103,7 +103,7 @@ void Level_Init(Level_Args* args) {
 }
 
 // Chamada em cada frame antes de Draw()
-void Level_Update(void (*set_scene)(Scene scene)) {
+void Level_Update(void (*set_scene)(Scene scene), void (*stop_engine)()) {
 	if (IsKeyPressed(KEY_TAB)) {
 		paused = !paused;
 	}
@@ -111,7 +111,7 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 	if (!paused) {
 		update_level(set_scene);
 	} else {
-		update_pause(set_scene);
+		update_pause(set_scene, stop_engine);
 	}
 }
 
@@ -463,7 +463,7 @@ void update_level(void (*set_scene)(Scene scene)) {
 }
 
 // Atualizar menu de pausa
-void update_pause(void (*set_scene)(Scene scene)) {
+void update_pause(void (*set_scene)(Scene scene), void (*stop_engine)()) {
 	if (IsKeyPressed(KEY_N)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 0;
@@ -484,7 +484,7 @@ void update_pause(void (*set_scene)(Scene scene)) {
 	}
 
 	if (IsKeyPressed(KEY_Q)) {
-		CloseWindow();
+		(*stop_engine)();
 		return;
 	}
 

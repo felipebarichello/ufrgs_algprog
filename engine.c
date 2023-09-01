@@ -8,6 +8,8 @@ Scene cur_scene;
 char scene_changed;
 void* next_scene_args;
 
+char should_stop;
+
 // Trocar a cena atual
 // `scene_args` é deve ser alocado dinamicamente pois a cena anterior descartará suas variáveis
 void SetScene(Scene scene, void* scene_args) {
@@ -16,8 +18,14 @@ void SetScene(Scene scene, void* scene_args) {
 	next_scene_args = scene_args;
 }
 
+void StopEngine() {
+	should_stop = 1;
+}
+
 void StartEngine(EngineBuilder* builder) {
 	void* scene_data;
+
+	should_stop = 0;
 
 	srand(time(NULL));
 
@@ -29,8 +37,8 @@ void StartEngine(EngineBuilder* builder) {
 	scene_changed = 0;
 	cur_scene.init(scene_data);
 
-	while (!WindowShouldClose()) {
-		cur_scene.update(&SetScene);
+	while (!WindowShouldClose() && !should_stop) {
+		cur_scene.update(&SetScene, &StopEngine);
 
 		if (!scene_changed) {
 			// Desenhar a cena atual se a cena for a mesma
