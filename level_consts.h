@@ -40,7 +40,7 @@
 #define BASE_SIGHT_RADIUS   5    // Raio de visão base, sem powerups
 #define BULLET_LIFETIME     1000 // Tempo de vida de um tiro
 #define SHOT_COOLDOWN       2000 // Delay entre tiros
-#define BULLET_SPEED        400  // Velocidade da bala
+#define BULLET_SPEED        600  // Velocidade da bala
 #define BULLET_LENGTH       1.f  // Comprimento visual e da hitbox da bala
 #define BULLET_DIAMETER     .3f  // Diâmetro visual e da hitbox da bala
 #define BULLET_SIGHT_RADIUS 4    // Raio de visão da bala
