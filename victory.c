@@ -9,7 +9,11 @@
 
 scene(Victory)
 
-void Victory_Update() {
+void Victory_Init(void* _) {
+
+}
+
+void Victory_Update(void (*set_scene)(Scene scene)) {
 	if (IsKeyPressed(KEY_N)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 0;
@@ -29,7 +33,7 @@ void Victory_Update() {
 
 void Victory_Draw() {
 	ClearBackground(RAYWHITE);
-	DrawText("Vitória", 175, 100, 3 * FONT_SIZE, GREEN);
+	DrawText("Vitï¿½ria", 175, 100, 3 * FONT_SIZE, GREEN);
 	DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, BLACK);
 	DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
 	DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
