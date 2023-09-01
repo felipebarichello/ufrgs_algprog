@@ -21,7 +21,6 @@ typedef struct {
 } is_enemy_at_Args;
 
 void new_game();
-void load_save();
 int load_level();
 int load_map(const char* file_name);
 void load_sounds();
@@ -97,7 +96,6 @@ void Level_Init(Level_Args* args) {
 		new_game();
 	}
 
-	load_level();
 
 	paused = 0;
 
@@ -198,6 +196,8 @@ void new_game() {
 	lives = 3;
 	score = 0;
 	current_level = 1;
+
+	load_level();
 }
 
 // Carregar o nível atual
@@ -216,8 +216,6 @@ int load_level() {
 	}
 
 	emeralds_collected = 0;
-	level_max_emeralds = 0;
-	enemy_touches_player = 0;
 
 	for (i = 0; i < ENEMY_MAX; i++) {
 		initial_enemy_pool.pool[i].active = 0;
@@ -225,6 +223,8 @@ int load_level() {
 
 	initial_enemy_pool.lower_bound = 0;
 	initial_enemy_pool.upper_bound = 0;
+
+	level_max_emeralds = 0;
 	
 	// Spawnar entidades e contar esmeraldas baseado no mapa
 	for (i = 0; i < level_size.y; i++) {
@@ -816,43 +816,31 @@ int check_level_complete() {
 }
 
 int make_savestate(const char* path) { //Savestates são salvos como arquivos de texto, porque só haverá suporte para um de cada vez 
-	FILE* fptr;
-	int i, j;
 	const int END_OF_ENEMIES = -1;
 
-	if ((fptr = fopen(path, "w")) == NULL) {
-		perror("Erro ao criar arquivo");
+	FILE* fptr;
+	int i, j;
+
+	if (!(fptr = fopen(path, "wb"))) {
+		perror("Erro ao criar arquivo\n");
 		return 0;
 	} else {
-		printf("Arquivo criado com sucesso");
-		for (j = 0; j < MAX_LEVEL_WIDTH; j++) { //Escreve o mapa contido na tela quando o jogador chamou o menu, com inimigos e player
-			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {
-
-				if (player_position.x == j && player_position.y == i) {
-					map[i][j] = T_PLAYER;
-				}
-
-				fprintf(fptr, "%c", map[i][j]);
-				printf("Escrita bem sucedida");
-			}
-
-			fprintf(fptr, "\n");
-		}
-
-		foreach_enemy(&write_enemy_position, fptr);
-		fprintf(fptr, "%d\t%d", END_OF_ENEMIES, END_OF_ENEMIES);
-		fprintf(fptr, "\n\n");
-		fprintf(fptr, "%d\t%d\t%d\n", lives, emeralds_collected, score);
-		fprintf(fptr, "%d", current_level);
-
-
+		fwrite(&current_level, sizeof(current_level), 1, fptr);
+		fwrite(&lives, sizeof(lives), 1, fptr);
+		fwrite(&score, sizeof(score), 1, fptr);
+		fwrite(map, sizeof(map), 1, fptr);
+		fwrite(&emeralds_collected, sizeof(emeralds_collected), 1, fptr);
+		fwrite(&player_position, sizeof(player_position), 1, fptr);
+		fwrite(&enemy_pool, sizeof(enemy_pool), 1, fptr);
 		fclose(fptr);
+
+		printf("Arquivo criado com sucesso\n");
 		return 1;
 	}
 }
 
 
-//Compatível com foreach_enemy
+// Compatível com foreach_enemy
 void write_enemy_position(PooledEnemy* enemy, FILE* fptr) {
 	fprintf(fptr, "%d\t%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
 }
@@ -870,36 +858,31 @@ int load_savestate(const char* path) {
 	pool.lower_bound = 0;
 	pool.upper_bound = 0;
 
-	if ((fptr = fopen(path, "r")) == NULL) {
-		perror("Erro ao abrir savestate");
+	if (!(fptr = fopen(path, "rb"))) {
+		perror("Erro ao abrir savestate\n");
 		return 0;
 	} else {
-		printf("Sucesso ao abrir savestate");
-		//read_map(map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH], fptr);
-		for (int i = 0; i < MAX_LEVEL_HEIGHT; i++) {
-			for (int j = 0; j < MAX_LEVEL_WIDTH; j++) {
-				map[i][j] = fgetc(fptr);
-				printf("%c", map[i][j]);
-			}
-			fgetc(fptr);
-			printf("\n");
+		char map_file_path[32];
+		int has_opened;
+
+		fread(&current_level, sizeof(current_level), 1, fptr);
+		sprintf(map_file_path, "resources/maps/%03d.map", current_level);
+		has_opened = load_map(map_file_path); // Aqui muitos dados importantes são inicializados, mesmo que muitos dados sejam descartados
+
+		if (!has_opened) {
+			perror("ERRO: O mapa do nível salvo não foi encontrado\n");
+			return 0;
 		}
 
-		do {
-			aux_vec2.x = fgetc(fptr);
+		fread(&lives, sizeof(lives), 1, fptr);
+		fread(&score, sizeof(score), 1, fptr);
+		fread(map, sizeof(map), 1, fptr);
+		fread(&emeralds_collected, sizeof(emeralds_collected), 1, fptr);
+		fread(&player_position, sizeof(player_position), 1, fptr);
+		fread(&enemy_pool, sizeof(enemy_pool), 1, fptr);
+		fclose(fptr);
 
-			if (aux_vec2.x != '\n') {
-				fscanf(fptr, "\t%d\n", &aux_vec2.y);
-				spawn_enemy(aux_vec2, &pool);
-				printf("%d\t%d", aux_vec2.x, aux_vec2.y);
-			}
-			printf("lendo contrabarra n");
-		} while (aux_vec2.y != -1);
-		fgetc(fptr);
-		fgetc(fptr);
-		fscanf(fptr, "%d	%d	%d\n", &lives, &emeralds_collected, &score);
-		fscanf(fptr, "%d", &current_level);
-		printf("lido o resto");
+		printf("Sucesso ao abrir savestate\n");
 	}
 
 	return 1;
