@@ -460,13 +460,17 @@ void update_pause(void (*set_scene)(Scene scene)) {
 	}
 	
 	if (IsKeyPressed(KEY_C)) {
+		/*
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 1;
 		set_scene(Level_Scene(), level_args);
+		*/
+		load_savestate("savestate.txt");
 		return;
 	}
 
 	if (IsKeyPressed(KEY_S)) {
+		make_savestate("savestate.txt");
 		return;
 	}
 
@@ -802,15 +806,14 @@ int check_level_complete() {
 
 int make_savestate(const char* path) { //Savestates são salvos como arquivos de texto, porque só haverá suporte para um de cada vez 
 	FILE* fptr;
-	FILE* buff;
-	//is_enemy_at_Args args;
 	int i, j;
 	const int const_neg_um = -1;
 
-	if (!(fptr = fopen_s(&buff, path, "w"))) {
+	if ((fptr = fopen(path, "w")) == NULL) {
 		perror("Erro ao criar arquivo");
 		return 0;
 	} else {
+		printf("Arquivo criado com sucesso");
 		for (j = 0; j < MAX_LEVEL_WIDTH; j++) { //Escreve o mapa contido na tela quando o jogador chamou o menu, com inimigos e player
 			for (i = 0; i < MAX_LEVEL_HEIGHT; i++) {
 
@@ -819,15 +822,17 @@ int make_savestate(const char* path) { //Savestates são salvos como arquivos de
 				}
 
 				fprintf(fptr, "%c", map[i][j]);
+				printf("Escrita bem sucedida");
 			}
 
 			fprintf(fptr, "\n");
 		}
 
-		foreach_enemy(&write_enemy_position, &fptr);
+		foreach_enemy(&write_enemy_position, fptr);
 		fprintf(fptr, "%d %d", const_neg_um, const_neg_um);
 		fprintf(fptr, "\n\n");
-		fprintf(fptr, "%d	%d	%d", lives, emeralds_collected, score);
+		fprintf(fptr, "%d	%d	%d\n", lives, emeralds_collected, score);
+		fprintf(fptr, "%d", current_level);
 
 
 		fclose(fptr);
@@ -847,22 +852,32 @@ int load_savestate(const char* path) {
 	Vec2 aux_vec2;
 	EnemyPool pool;
 
-	if (!(fptr = fopen_s(&buff, path, "r"))) {
+	if ((fptr = fopen(path, "r")) == NULL) {
 		perror("Error in loading savestate");
 		return 0;
 	} else {
-		read_map(map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH], fptr);
+		printf("Sucesso ao abrir savestate");
+		//read_map(map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH], fptr);
+		for (int i = 0; i < MAX_LEVEL_HEIGHT; i++) {
+			for (int j = 0; j < MAX_LEVEL_WIDTH; j++) {
+				map[i][j] = fgetc(fptr);
+			}
+			fgetc(fptr);
+		}
 		fgetc(fptr);
 		do {
-			fscanf_s(fptr, "%d", &aux_vec2.x);
-			_fgetchar(fptr);
-			fscanf_s(fptr, "%d", &aux_vec2.y);
-			_fgetchar(fptr);
-			spawn_enemy(aux_vec2, &pool);
+			if (_fgetchar(fptr) != '\n') {
+				fscanf(fptr, "%d", &aux_vec2.x);
+				_fgetchar(fptr);
+				fscanf_s(fptr, "%d", &aux_vec2.y);
+				_fgetchar(fptr);
+				spawn_enemy(aux_vec2, &pool);
+			}
 		} while (aux_vec2.y != -1);
 		fgetc(fptr);
 		fgetc(fptr);
-		fscanf_s(fptr, "%d	%d	%d", &lives, &emeralds_collected, &score);
+		fscanf(fptr, "%d	%d	%d\n", &lives, &emeralds_collected, &score);
+		fscanf(fptr, "%d", &current_level);
 	}
 
 	return 1;
