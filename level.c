@@ -867,8 +867,8 @@ int load_savestate(const char* path) {
 		pool.pool[i].active = 0;
 	}
 
-	enemy_pool.lower_bound = 0;
-	enemy_pool.upper_bound = 0;
+	pool.lower_bound = 0;
+	pool.upper_bound = 0;
 
 	if ((fptr = fopen(path, "r")) == NULL) {
 		perror("Erro ao abrir savestate");
