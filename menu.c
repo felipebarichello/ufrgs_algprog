@@ -39,7 +39,7 @@ void Menu_Update(void (*set_scene)(Scene scene)) {
 
 void Menu_Draw(void* _) {
 	ClearBackground(RAYWHITE);
-	DrawText("Over Engineered Pac Mine", 175, 100, 2 * FONT_SIZE, RED);
+	DrawText("Over Engineered Pac Mine", 175, 100, 4 * FONT_SIZE, RED);
 	DrawText("(N): Novo Jogo", 300, 250, FONT_SIZE, BLACK);
 	DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
 	DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
