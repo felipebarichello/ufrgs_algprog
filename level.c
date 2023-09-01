@@ -53,8 +53,7 @@ int unit_length, sight_radius, emeralds_collected;
 char map_name[18];
 
 char /*Tile*/ map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
-int level_max_emeralds, max_level, current_level = 0, next_level;
-char level_map_path[64];
+int level_max_emeralds, current_level;
 
 EnemyPool enemy_pool;
 EnemyPool initial_enemy_pool;
@@ -91,8 +90,6 @@ void Level_Init(Level_Args* args) {
 	load_sounds();
 
 	bullet_speed = BULLET_SPEED / FPS;
-
-	next_level = current_level + 1;
 
 	if (args->load_saved_game) {
 		// load_save();
@@ -200,15 +197,19 @@ void Level_Draw() {
 void new_game() {
 	lives = 3;
 	score = 0;
+	current_level = 1;
 }
 
-// Carregar o nível de caminho `level_map_path`
+// Carregar o nível atual
 // Retorna 1 se foi carregado com sucesso, 0 caso contrário
 int load_level() {
 	int i, j;
 	int has_opened;
+	char map_file_path[32];
 
-	has_opened = load_map(level_map_path);
+	sprintf(map_file_path, "resources/maps/%03d.map", current_level);
+
+	has_opened = load_map(map_file_path);
 
 	if (!has_opened) {
 		return false;
@@ -438,13 +439,6 @@ void update_level(void (*set_scene)(Scene scene)) {
 		int file_exists;
 
 		current_level++;
-		next_level++;
-
-		strcpy(level_map_path, "resources/maps/");
-		strcpy(map_name, "mapa");
-		sprintf(map_name, "%s%d", map_name, current_level);
-		strcat(map_name, ".map");
-		strcat(level_map_path, map_name);
 
 		file_exists = load_level();
 
