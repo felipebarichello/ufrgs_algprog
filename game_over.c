@@ -25,16 +25,19 @@ void GameOver_Update(void (*set_scene)(Scene scene)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 0;
 		set_scene(Level_Scene(), level_args);
+		return;
 	}
-
+	
 	if (IsKeyPressed(KEY_C)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 1;
 		set_scene(Level_Scene(), level_args);
+		return;
 	}
 
 	if (IsKeyPressed(KEY_Q)) {
 		CloseWindow();
+		return;
 	}
 }
 
