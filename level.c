@@ -41,9 +41,6 @@ char is_in_sight(Vec2 pos);
 void draw_tile(Vec2 position, Color color);
 void draw_enemy(PooledEnemy* enemy, void*);
 void check_collectable();
-void print_emeralds(Vec2 caixa);
-void print_score(Vec2 caixa);
-void print_lives(Vec2 caixa);
 int check_level_complete();
 int make_savestate(const char* path);
 void write_enemy_position(PooledEnemy* enemy, FILE* fptr);
@@ -182,16 +179,12 @@ void Level_Draw() {
 			DrawEllipse(0, 0, bullet_size.y, bullet_size.x, COLOR_BULLET);
 		EndRotation();
 	}
+
 	/*Imprimir informações de vidas, score e esmeraldas*/
 
-	text_box.x = 0;
-	print_lives(text_box);
-
-	text_box.x += 260;
-	print_emeralds(text_box);
-
-	text_box.x += 260;
-	print_score(text_box);
+	DrawText(TextFormat("Vidas: %02i", lives), 100, 0, FONT_SIZE, RED);
+	DrawText(TextFormat("Esmeraldas: %02i / %02i", emeralds_collected, level_max_emeralds), 300, 0, FONT_SIZE, COLOR_EMERALD_TEXT);
+	DrawText(TextFormat("Pontuação: %06i", score), 500, 0, FONT_SIZE, COLOR_SCORE);
 
 
 	// Se estiver pausado, escurecer o fundo e desenhar o menu de pausa
@@ -425,18 +418,6 @@ void update_level() {
 
 		enemy_touches_player = 0;
 	}
-
-	/*Imprimir informações de vidas, score e esmeraldas*/
-
-	text_box.x = 0;
-	print_lives(text_box);
-
-	text_box.x += 260;
-	print_emeralds(text_box);
-
-	text_box.x += 260;
-	print_score(text_box);
-
 	
 	if (check_level_complete()) {
 		next_level++;
@@ -802,28 +783,6 @@ void check_collectable() {
 				break;
 		}
 	}
-}
-
-void print_lives(Vec2 caixa) { //Precisa ser chamada a cada contato com inimigo
-	DrawText(TextFormat("Lives: %02i", lives), caixa.x, caixa.y, FONT_SIZE, RED);
-}
-
-void print_score(Vec2 caixa) { //Precisa ser chamada cada vez que um item for coletado
-	char score_string[24];
-
-	strcpy(score_string, "Score: ");
-	sprintf(score_string, "%s%d", score_string, score);
-	DrawText(score_string, caixa.x, caixa.y, FONT_SIZE, COLOR_SCORE);
-}
-
-void print_emeralds(Vec2 caixa) { //Precisa ser chamada toda vez que uma esmeralda for coletada
-	char emerald_string[18];
-
-	strcpy(emerald_string, "Emeralds: ");
-	sprintf(emerald_string, "%s%d", emerald_string, emeralds_collected);
-	strcat(emerald_string, "/");
-	sprintf(emerald_string, "%s%d", emerald_string, level_max_emeralds);
-	DrawText(emerald_string, caixa.x, caixa.y, FONT_SIZE, COLOR_EMERALD_TEXT);
 }
 
 int check_level_complete() {
