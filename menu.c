@@ -12,13 +12,6 @@
 scene(Menu)
 
 
-int score, lives, emeralds_collected, next_level;
-char load_level = 0;
-
-
-void read_enemy_position(PooledEnemy* enemy, FILE* fptr);
-void new_game();
-
 void Menu_Init() {
 	SetTargetFPS(FPS);
 }
@@ -51,17 +44,3 @@ void Menu_Draw(void* _) {
 	DrawText("(C): Carregar Jogo", 300, 300, FONT_SIZE, BLACK);
 	DrawText("(Q): Sair do Jogo", 300, 350, FONT_SIZE, BLACK);
 }
-
-
-/*
-
-
-void read_enemy_position(PooledEnemy* enemy, FILE* fptr) {
-	fscanf_s(fptr, "%d	%d\n", enemy->enemy.position.x, enemy->enemy.position.y);
-}
-
-
-void new_game() {
-	SetScene(Level_Scene());
-}
-*/
