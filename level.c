@@ -779,7 +779,9 @@ void draw_tile(Vec2 position, Color color) {
 // O parâmetro `_` é ignorado
 void draw_enemy(PooledEnemy* enemy, void* _) {
 	if (is_in_sight(enemy->enemy.position)) {
-		draw_tile(enemy->enemy.position, COLOR_ENEMY);
+		if (map[enemy->enemy.position.y][enemy->enemy.position.x] != T_BURIED) {
+			draw_tile(enemy->enemy.position, COLOR_ENEMY);
+		}
 	}
 }
 
