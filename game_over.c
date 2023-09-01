@@ -17,7 +17,7 @@ void GameOver_Init(GameOver_Args* args) {
 	ending = args->ending;
 	score = args->score;
 
-	//free(args);
+	free(args);
 }
 
 void GameOver_Update(void (*set_scene)(Scene scene)) {

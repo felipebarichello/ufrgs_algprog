@@ -439,7 +439,7 @@ void update_level(void (*set_scene)(Scene scene)) {
 			GameOver_Args* gameover_args = malloc(sizeof(GameOver_Args));
 			gameover_args->ending = VICTORY;
 			gameover_args->score = score;
-			set_scene(GameOver_Scene(), &gameover_args);
+			set_scene(GameOver_Scene(), gameover_args);
 		}
 	}
 	
