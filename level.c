@@ -91,7 +91,11 @@ void Level_Init(Level_Args* args) {
 	bullet_speed = BULLET_SPEED / FPS;
 
 	if (args->load_saved_game) {
-		load_savestate("data/savestate.sav");
+		int file_exists = load_savestate("data/savestate.sav");
+
+		if (!file_exists) {
+			new_game();
+		}
 	} else {
 		new_game();
 	}
