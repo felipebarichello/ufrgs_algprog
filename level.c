@@ -25,7 +25,7 @@ void load_save();
 void load_map(const char* file_name);
 void load_sounds();
 void update_level();
-void update_pause();
+void update_pause(void (*set_scene)(Scene scene));
 void soft_reset();
 void set_unit_length(int length);
 char is_in_bounds(Vec2 position);
@@ -120,7 +120,7 @@ void Level_Update(void (*set_scene)(Scene scene)) {
 	if (!paused) {
 		update_level();
 	} else {
-		update_pause();
+		update_pause(set_scene);
 	}
 }
 
@@ -198,7 +198,7 @@ void Level_Draw() {
 		DrawText("PAUSED", GetScreenWidth() / 2 - 200, GetScreenHeight() / 2 - 200, 100, WHITE);
 		DrawText("(N): Novo Jogo",     250, 250, 24, WHITE);
 		DrawText("(C): Carregar Jogo", 250, 300, 24, WHITE);
-		DrawText("(C): Salvar Jogo",   250, 350, 24, WHITE);
+		DrawText("(S): Salvar Jogo",   250, 350, 24, WHITE);
 		DrawText("(Q): Sair do Jogo",  250, 400, 24, WHITE);
 		DrawText("(V): Voltar",        250, 450, 24, WHITE);
 	}
@@ -457,8 +457,34 @@ void update_level() {
 	*/
 }
 
-void update_pause() {
+void update_pause(void (*set_scene)(Scene scene)) {
+	if (IsKeyPressed(KEY_N)) {
+		Level_Args* level_args = malloc(sizeof(Level_Args));
+		level_args->load_saved_game = 0;
+		set_scene(Level_Scene(), level_args);
+		return;
+	}
+	
+	if (IsKeyPressed(KEY_C)) {
+		Level_Args* level_args = malloc(sizeof(Level_Args));
+		level_args->load_saved_game = 1;
+		set_scene(Level_Scene(), level_args);
+		return;
+	}
 
+	if (IsKeyPressed(KEY_S)) {
+		return;
+	}
+
+	if (IsKeyPressed(KEY_Q)) {
+		CloseWindow();
+		return;
+	}
+
+	if (IsKeyPressed(KEY_V)) {
+		paused = 0;
+		return;
+	}
 }
 
 // Reseta parcialmente o nível

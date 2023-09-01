@@ -40,13 +40,13 @@
     [ ] Mas é dinâmico para qualquer numero de mapas
     [ ] Mínimo 30x20 (dimensões) cada um
     
-[x] Menu principal
+[ ] Menu principal
     [x] (N) Novo jogo
     [ ] (C) Carregar jogo
-    [ ] (Q) Sair
+    [x] (Q) Sair
 
 [ ] Menu in-game
-    [ ] (N) Novo Jogo: Quando o usuário seleciona esta opção, um novo jogo é iniciado, a partir do
+    [x] (N) Novo Jogo: Quando o usuário seleciona esta opção, um novo jogo é iniciado, a partir do
 primeiro nível. Todo progresso e número de vidas do jogador também é resetado.
     [ ] (C) Carregar jogo: Quando o usuário seleciona esta opção, um jogo previamente salvo deve ser
 carregado. Você pode assumir que existe apenas um jogo salvo e que pode ser carregado.
@@ -56,8 +56,8 @@ em que foi salvo. Essas informações incluem posições do jogador e dos monstr
 paredes, itens desbloqueados, número de vidas, fase, etc. Tudo que for necessário para o jogo
 passar a funcionar normalmente a partir daquele ponto, como se o usuário nunca tivesse parado de
 jogar.
-    [ ] (Q) Sair do jogo: Quando o usuário seleciona esta opção, o jogo é finalizado, sem salvar.
-    [ ] (V) Voltar: Quando o usuário seleciona esta opção, deve-se abandonar o menu e o controle volta
+    [x] (Q) Sair do jogo: Quando o usuário seleciona esta opção, o jogo é finalizado, sem salvar.
+    [x] (V) Voltar: Quando o usuário seleciona esta opção, deve-se abandonar o menu e o controle volta
 para o jogo, que continua do ponto em que parou quando o usuário acessou o menu.
 
 [ ] Game over
