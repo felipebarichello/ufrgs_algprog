@@ -476,12 +476,12 @@ void update_pause(void (*set_scene)(Scene scene)) {
 		level_args->load_saved_game = 1;
 		set_scene(Level_Scene(), level_args);
 		*/
-		load_savestate("savestate.txt");
+		load_savestate("data/savestate.sav");
 		return;
 	}
 
 	if (IsKeyPressed(KEY_S)) {
-		make_savestate("savestate.txt");
+		make_savestate("data/savestate.sav");
 		return;
 	}
 

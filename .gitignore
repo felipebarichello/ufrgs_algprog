@@ -1,5 +1,6 @@
-Debug/
+/Debug/
 /x64/
 /.vs/
 /*.vcxproj.user
-vcpkg/
+/vcpkg/
+/data/
