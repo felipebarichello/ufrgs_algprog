@@ -152,13 +152,16 @@
     <ClCompile Include="debug.h" />
     <ClCompile Include="engine.c" />
     <ClCompile Include="gamelib.c" />
+    <ClCompile Include="Game_Over.c" />
     <ClCompile Include="level_consts.h" />
     <ClCompile Include="main.c" />
     <ClCompile Include="level.c" />
     <ClCompile Include="map_reader.c" />
     <ClCompile Include="menu.c" />
+    <ClCompile Include="Victory.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game_Over.h" />
     <ClInclude Include="map_reader.h" />
     <ClInclude Include="menu.h" />
     <ClInclude Include="scene.h" />
@@ -167,6 +170,7 @@
     <ClInclude Include="gamelib.h" />
     <ClInclude Include="level.h" />
     <ClInclude Include="level_lib.h" />
+    <ClInclude Include="Victory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

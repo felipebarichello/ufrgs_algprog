@@ -11,7 +11,7 @@
 
 scene(Menu)
 
-char map[MAX_LEVEL_HEIGHT][MAX_LEVEL_WIDTH];
+
 int score, lives, emeralds_collected, next_level;
 char load_level = 0;
 
@@ -24,21 +24,22 @@ void Menu_Init() {
 }
 
 void Menu_Update(void (*set_scene)(Scene scene)) {
-	//As fun��es aqui n�o funcionam por enquanto - como � �bvio. S�o s� uma indica��o do que fazer quando conseguir passar as infos pro level
+
 	if (IsKeyPressed(KEY_N)) {
 		Level_Args* level_args = malloc(sizeof(Level_Args));
 		level_args->load_saved_game = 0;
 		set_scene(Level_Scene(), level_args);
 	}
 
-	// if (IsKeyPressed(KEY_C)) {
-	// 	SetScene(Level);
-	// 	load_savestate(savestate.txt);
-	// }
+	 if (IsKeyPressed(KEY_C)) {
+		 Level_Args* level_args = malloc(sizeof(Level_Args));
+		 level_args->load_saved_game = 1;
+		 set_scene(Level_Scene(), level_args);
+	 }
 
-	// if (IsKeyPressed(KEY_Q)) {
-	// 	CloseWindow(); //Essa aqui t� pronta
-	// }
+	 if (IsKeyPressed(KEY_Q)) {
+	 	CloseWindow(); 
+	 }
 }
 
 void Menu_Draw(void* _) {
