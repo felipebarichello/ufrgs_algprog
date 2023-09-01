@@ -37,7 +37,7 @@ void Menu_Update(void (*set_scene)(Scene scene), void (*stop_engine)()) {
 	}
 }
 
-void Menu_Draw(void* _) {
+void Menu_Draw() {
 	ClearBackground(RAYWHITE);
 	DrawText("Overengineered", 175, 100, 3 * FONT_SIZE, RED);
 	DrawText("Pac-Mine", 200, 140, 5 * FONT_SIZE, DARKBLUE);
